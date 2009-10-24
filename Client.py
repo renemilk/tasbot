@@ -79,6 +79,12 @@ def parsecommand(cl,c,args,events,sock):
 			except:
 				error("Invalid JOINEDBATTLE Command from server: %s %s"%(c,str(args)))
 				print traceback.format_exc()
+		if c == "BATTLEOPENED" and len(args) >= 4:
+			try:
+				cl.users[args[3]].battleid = int(args[0])
+			except:
+				error("Invalid BATTLEOPENED Command from server: %s %s"%(c,str(args)))
+				print traceback.format_exc()
 		if c == "LEFTBATTLE" and len(args) >= 2:
 			try:
 				cl.users[args[1]].battleid = -1

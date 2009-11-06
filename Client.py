@@ -259,7 +259,7 @@ class tasclient:
 		self.sock = 0
 	def login(self,username,password,client,cpu,lanip="*"):
 		notice("Trying to login with username %s " % (username))
-		lanip = self.socket.getsockname()[0]
+		lanip = self.sock.getsockname()[0]
 		#print "LOGIN %s %s %i * %s\n" % (username,password,cpu,client)
 		try:
 			self.sock.send("LOGIN %s %s %i %s %s\t0\t%s\n" % (username,password,cpu,lanip,client,"a"))

@@ -1,18 +1,6 @@
 # -*- coding: utf-8 -*-
-import os
-import sys
-import string
-import base64
-import md5
-import time
-import ParseConfig
-import thread
-import Plugin
-import traceback
-from colors import *
-import Client
-import binascii
-from customlog import Log
+import os, sys, string, base64, md5, time, ParseConfig, thread, Plugin, traceback, Client, binascii
+from customlog import *
 
 class MainApp:
 	firstconnect = 1

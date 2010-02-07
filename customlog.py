@@ -12,14 +12,16 @@ class CLog:
 		self.info_to_stdout = info_to_stdout
 		self.logfile = open( logfile_name, 'a' )
 		assert self.logfile, 'couldn\'t open logfile %s'%logfile_name
-		self.Info( 'session started' )
 		if error_log_name != logfile_name:
 			self.errfile = open( error_log_name, 'a' )
 			assert self.errfile, 'couldn\'t open logfile %s'%error_log_name
-			self.Error( 'session started' )
 		else:
 			self.errfile = self.logfile
 		self.initialised = True
+		self.Info( 'session started' )
+		if error_log_name != logfile_name:
+			self.Error( 'session started' )
+
 
 	def Error(self, msg,prefix=None):
 		if prefix:

@@ -90,8 +90,11 @@ class MainApp:
 		
 		for p in ParseConfig.parselist(self.config["plugins"],","):
 			self.ph.addplugin(p,self.tasclient)
-		
-		self.tasclient.events.onconnectedplugin = self.ph.onconnected 
+
+		#todo get this from config
+		Log.Init( 'stdout.log', 'stderr.log' )
+
+		self.tasclient.events.onconnectedplugin = self.ph.onconnected
 		self.tasclient.events.onconnected = self.Dologin
 		self.tasclient.events.onloggedin = self.onlogin
 		self.reg = register

@@ -1,4 +1,5 @@
-from colors import *
+# -*- coding: utf-8 -*-
+from customlog import *
 import sys
 import traceback
 import inspect
@@ -28,10 +29,8 @@ class plghandler:
 		try:
 			code = __import__(name)
 		except:
-			print '-'*60
-			traceback.print_exc(file=sys.stdout)
-			print '-'*60
 			error("Cannot load plugin   "+name)
+			Log.Error( traceback.print_exc() )
 			return
 		
 		self.plugins.update([(name,code.Main())])
@@ -48,9 +47,7 @@ class plghandler:
 				self.plugins[name].onloggedin(tasc.sock)
 		except:
 			error("Cannot load plugin   "+name)
-			print '-'*60
-			traceback.print_exc(file=sys.stdout)
-			print '-'*60
+			Log.Error( traceback.print_exc() )
 			return
 		loaded("Plugin " + name)
 	def unloadplugin(self,name):
@@ -69,9 +66,8 @@ class plghandler:
 		except:
 			error("Cannot unload plugin   "+name)
 			error("Use forceunload to remove it anyway")
-			print '-'*60
-			traceback.print_exc(file=sys.stdout)
-			print '-'*60
+			Log.Error( traceback.print_exc() )
+
 	def forceunloadplugin(self,name,tasc):
 		if not name in self.plugins:
 			error("Plugin %s not loaded"%name)
@@ -89,9 +85,7 @@ class plghandler:
 		except:
 			error("Cannot unload plugin   "+name)
 			error("Use forceunload to remove it anyway")
-			print '-'*60
-			traceback.print_exc(file=sys.stdout)
-			print '-'*60
+			Log.Error( traceback.print_exc() )
 		try:
 			code = reload(sys.modules[name])
 		except:
@@ -111,11 +105,10 @@ class plghandler:
 				self.plugins[name].onload(self.app.tasclient)
 		except:
 			error("Cannot load plugin   "+name)
-			print '-'*60
-			traceback.print_exc(file=sys.stdout)
-			print '-'*60
+			Log.Error( traceback.print_exc() )
 			return
 		loaded("Plugin " + name)
+
 	def onconnected(self):
 		for plugin in self.plugins:
 			try:
@@ -125,9 +118,8 @@ class plghandler:
 				raise SystemExit(0)
 			except:
 				error("PLUGIN ERROR")
-				print '-'*60
-				traceback.print_exc(file=sys.stdout)
-				print '-'*60
+				Log.Error( traceback.print_exc() )
+
 	def ondisconnected(self):
 		for plugin in self.plugins:
 			try:
@@ -137,9 +129,8 @@ class plghandler:
 				raise SystemExit(0)
 			except:
 				error("PLUGIN ERROR")
-				print '-'*60
-				traceback.print_exc(file=sys.stdout)
-				print '-'*60
+				Log.Error( traceback.print_exc() )
+
 	def onmotd(self,content):
 		for plugin in self.plugins:
 			try:
@@ -149,9 +140,8 @@ class plghandler:
 				raise SystemExit(0)
 			except:
 				error("PLUGIN ERROR")
-				print '-'*60
-				traceback.print_exc(file=sys.stdout)
-				print '-'*60
+				Log.Error( traceback.print_exc() )
+
 	def onsaid(self,channel,user,message):
 		for plugin in self.plugins:
 			try:
@@ -161,9 +151,8 @@ class plghandler:
 				raise SystemExit(0)
 			except:
 				error("PLUGIN ERROR")
-				print '-'*60
-				traceback.print_exc(file=sys.stdout)
-				print '-'*60
+				Log.Error( traceback.print_exc() )
+
 	def onsaidex(self,channel,user,message):
 		for plugin in self.plugins:
 			try:
@@ -173,9 +162,8 @@ class plghandler:
 				raise SystemExit(0)
 			except:
 				error("PLUGIN ERROR")
-				print '-'*60
-				traceback.print_exc(file=sys.stdout)
-				print '-'*60
+				Log.Error( traceback.print_exc() )
+
 	def onsaidprivate(self,user,message):
 		args = message.split(" ")
 		if args[0].lower() == "!reloadconfig" and user in self.app.admins:
@@ -185,25 +173,22 @@ class plghandler:
 				self.unloadplugin(args[1])
 			except:
 				bad("Unloadplugin failed")
-				print '-'*60
-				traceback.print_exc(file=sys.stdout)
-				print '-'*60
+				Log.Error( traceback.print_exc() )
+
 		if args[0].lower() == "!loadplugin" and user in self.app.admins and len(args) == 2:
 			try:
 				self.addplugin(args[1],self.app.tasclient)
 			except:
 				bad("addplugin failed")
-				print '-'*60
-				traceback.print_exc(file=sys.stdout)
-				print '-'*60
+				Log.Error( traceback.print_exc() )
+
 		if args[0].lower() == "!reloadplugin" and user in self.app.admins and len(args) == 2:
 			try:
 				self.reloadplugin(args[1])
 			except:
 				bad("Unloadplugin failed")
-				print '-'*60
-				traceback.print_exc(file=sys.stdout)
-				print '-'*60
+				Log.Error( traceback.print_exc() )
+
 		for plugin in self.plugins:
 			try:
 				if "onsaidprivate" in dir(self.plugins[plugin]):
@@ -212,9 +197,8 @@ class plghandler:
 				raise SystemExit(0)
 			except:
 				error("PLUGIN ERROR")
-				print '-'*60
-				traceback.print_exc(file=sys.stdout)
-				print '-'*60
+				Log.Error( traceback.print_exc() )
+
 	def onloggedin(self,socket):
 		
 		for plugin in self.plugins:
@@ -227,9 +211,8 @@ class plghandler:
 				raise SystemExit(0)
 			except:
 				error("PLUGIN ERROR")
-				print '-'*60
-				traceback.print_exc(file=sys.stdout)
-				print '-'*60
+				Log.Error( traceback.print_exc() )
+
 	def onpong(self):
 		for plugin in self.plugins:
 			try:
@@ -239,11 +222,9 @@ class plghandler:
 				raise SystemExit(0)
 			except:
 				error("PLUGIN ERROR")
-				print '-'*60
-				traceback.print_exc(file=sys.stdout)
-				print '-'*60
+				Log.Error( traceback.print_exc() )
+
 	def oncommandfromserver(self,command,args,socket):
-		
 		for plugin in self.plugins:
 			try:
 				if "oncommandfromserver" in dir(self.plugins[plugin]):
@@ -254,30 +235,27 @@ class plghandler:
 				raise SystemExit(0)	
 			except:
 				error("PLUGIN ERROR")
-				print '-'*60
-				traceback.print_exc(file=sys.stdout)
-				print '-'*60
+				Log.Error( traceback.print_exc() )
+
 	def onexit(self):
-	  for plugin in self.plugins:
-	    try:
-		    if "onexit" in dir(self.plugins[plugin]):
-			    self.plugins[plugin].onexit()
-	    except SystemExit:
-		    raise SystemExit(0)
-	    except:
-		    error("PLUGIN ERROR")
-		    print '-'*60
-		    traceback.print_exc(file=sys.stdout)
-		    print '-'*60
+		for plugin in self.plugins:
+			try:
+				if "onexit" in dir(self.plugins[plugin]):
+					self.plugins[plugin].onexit()
+			except SystemExit:
+				raise SystemExit(0)
+			except:
+				error("PLUGIN ERROR")
+				Log.Error( traceback.print_exc() )
+
 	def ondisconnected(self):
-	  for plugin in self.plugins:
-	    try:
-		    if "ondisconnected" in dir(self.plugins[plugin]):
-			    self.plugins[plugin].ondisconnected()
-	    except SystemExit:
-		    raise SystemExit(0)
-	    except:
-		    error("PLUGIN ERROR")
-		    print '-'*60
-		    traceback.print_exc(file=sys.stdout)
-		    print '-'*60
+		for plugin in self.plugins:
+			try:
+				if "ondisconnected" in dir(self.plugins[plugin]):
+					self.plugins[plugin].ondisconnected()
+			except SystemExit:
+				raise SystemExit(0)
+			except:
+				error("PLUGIN ERROR")
+				Log.Error( traceback.print_exc() )
+

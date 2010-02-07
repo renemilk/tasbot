@@ -12,6 +12,8 @@ import traceback
 from colors import *
 import Client
 import binascii
+from customlog import Log
+
 class MainApp:
 	firstconnect = 1
 	er = 0
@@ -120,7 +122,5 @@ except KeyboardInterrupt:
 	exit(0)
 except:
 	error("parsing command line")
-	print '-'*60
-        traceback.print_exc(file=sys.stdout)
-	print '-'*60
+	Log.Error( traceback.print_exc(file=sys.stdout) )
 	

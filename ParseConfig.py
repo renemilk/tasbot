@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-import string
-import os
-from colors import *
+import string, traceback, os
+from customlog import *
+
 def readconfigfile(filename):
 	entries = dict()
 	try:
@@ -28,7 +28,7 @@ def readconfigfile(filename):
 			entries.update([(ed[0].lower().strip(" \n\r\t;").replace("\r\n",""),"=".join(ed[1:]).strip(" \n\r\t;").replace("\r\n",""))])
 		else:
 			error("Invalid line on config file %s :\n\t%s" % ( filename , entry ) + normal)
-	good("Loaded config file %s succesfully, %i entries" % (filename,len(entries)))
+	#good("Loaded config file %s succesfully, %i entries" % (filename,len(entries)))
 	return entries
 def writeconfigfile(filename,entries):
 	f = open(filename,"w")
@@ -43,3 +43,27 @@ def parselist(string,sep):
 		l.append(i.strip())
 	return l
 			
+class Config:
+	def __init__( self, filename ):
+		self.config = readconfigfile( filename )
+		self.filename = filename
+
+	def GetSingleOption( self, key, default ):
+		if key in self.config:
+			return self.config[key]
+		return default
+
+	def GetOptionList( self, key, seperator=',',default=[] ):
+		if key in self.config:
+			return parselist( self.config[key], seperator )
+		return default
+
+	def __getitem__(self, key):
+		val = self.GetSingleOption( key, ' ' )
+		if not val:
+			Log.Error( "key %s not found in %s"%(key,self.filename), 'Config' )
+			raise Exception
+		return val
+
+	def write(self, filename):
+		writeconfigfile( filename, self.config)

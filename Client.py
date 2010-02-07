@@ -1,31 +1,27 @@
 # -*- coding: utf-8 -*-
 from socket import *
-import string
-import re
-import time
-import utilities
+import string, re, time, utilities, sys, traceback
 from utilities import *
-from colors import *
-import sys
-import traceback
+from customlog import *
+
 class User:
-        def __init__(self,username,id,country,cpu):
-                self.username = username
-                self.id = id
-                self.country = country
-                self.cpu = cpu
-                self.afk = False
-                self.ingame = False
-                self.mod = False
-                self.rank = 0
-                self.bot = False
-                self.battleid = -1
-        def clientstatus(self,status):
-                self.afk = bool(getaway(int(status)))
-                self.ingame = bool(getingame(int(status)))
-                self.mod = bool(getmod(int(status)))
-                self.bot = bool(getbot(int(status)))
-                self.rank = getrank(status)-1
+	def __init__(self,username,id,country,cpu):
+			self.username = username
+			self.id = id
+			self.country = country
+			self.cpu = cpu
+			self.afk = False
+			self.ingame = False
+			self.mod = False
+			self.rank = 0
+			self.bot = False
+			self.battleid = -1
+	def clientstatus(self,status):
+			self.afk = bool(getaway(int(status)))
+			self.ingame = bool(getingame(int(status)))
+			self.mod = bool(getmod(int(status)))
+			self.bot = bool(getbot(int(status)))
+			self.rank = getrank(status)-1
                 
 def parsecommand(cl,c,args,events,sock):
 	if c.strip() != "":
@@ -78,52 +74,52 @@ def parsecommand(cl,c,args,events,sock):
 				cl.users[args[1]].battleid = int(args[0])
 			except:
 				error("Invalid JOINEDBATTLE Command from server: %s %s"%(c,str(args)))
-				print traceback.format_exc()
+				Log.Error( traceback.format_exc() )
 		if c == "BATTLEOPENED" and len(args) >= 4:
 			try:
 				cl.users[args[3]].battleid = int(args[0])
 			except:
 				error("Invalid BATTLEOPENED Command from server: %s %s"%(c,str(args)))
-				print traceback.format_exc()
+				Log.Error( traceback.format_exc() )
 		if c == "LEFTBATTLE" and len(args) >= 2:
 			try:
 				cl.users[args[1]].battleid = -1
 			except:
 				error("Invalid LEFTBATTLE Command from server: %s %s"%(c,str(args)))
-				print traceback.format_exc()
+				Log.Error( traceback.format_exc() )
 		if c == "SAIDPRIVATE" and len(args) >= 2:
 			events.onsaidprivate(args[0],' '.join(args[1:]))
 		if c == "ADDUSER":
-                        try:
-                                if len(args) == 4:#Account id
-                                        cl.users[args[0]] = User(args[0],int(args[3]),args[1],int(args[2]))
-                                        #notice(args[0]+":"+args[3])
-                                elif len(args) == 3:
-                                        cl.users[args[0]] = User(args[0],int(-1),args[1],int(args[2]))
-                                        #notice(args[0]+":"+"-1")
-                                else:
-                                        error("Invalid ADDUSER Command from server: %s %s"%(c,str(args)))
-                        except:
-                                error("Invalid ADDUSER Command from server: %s %s"%(c,str(args)))
-                                print traceback.format_exc()
-                if c == "REMOVEUSER":
-                        if len(args) == 1:
-                                if args[0] in cl.users:
-                                        del cl.users[args[0]]
-                                else:
-                                        error("Invalid REMOVEUSER Command: no such user"+args[0])
-                        else:
-                                error("Invalid REMOVEUSER Command: not enough arguments")
-                if c == "CLIENTSTATUS":
-                        if len(args) == 2:
-                                if args[0] in cl.users:
-                                        try:
-                                                cl.users[args[0]].clientstatus(int(args[1]))
-                                        except:
-                                                error("Malformed CLIENTSTATUS")
-                                                print traceback.format_exc()
-                                else:
-                                        error("Invalid CLIENTSTATUS: No such user <%s>" % args[0])
+			try:
+				if len(args) == 4:#Account id
+					cl.users[args[0]] = User(args[0],int(args[3]),args[1],int(args[2]))
+					#notice(args[0]+":"+args[3])
+				elif len(args) == 3:
+					cl.users[args[0]] = User(args[0],int(-1),args[1],int(args[2]))
+					#notice(args[0]+":"+"-1")
+				else:
+					error("Invalid ADDUSER Command from server: %s %s"%(c,str(args)))
+			except:
+				error("Invalid ADDUSER Command from server: %s %s"%(c,str(args)))
+				Log.Error( traceback.format_exc() )
+		if c == "REMOVEUSER":
+			if len(args) == 1:
+				if args[0] in cl.users:
+					del cl.users[args[0]]
+				else:
+					error("Invalid REMOVEUSER Command: no such user"+args[0])
+			else:
+					error("Invalid REMOVEUSER Command: not enough arguments")
+		if c == "CLIENTSTATUS":
+			if len(args) == 2:
+				if args[0] in cl.users:
+					try:
+						cl.users[args[0]].clientstatus(int(args[1]))
+					except:
+						error("Malformed CLIENTSTATUS")
+						Log.Error( traceback.format_exc() )
+				else:
+					error("Invalid CLIENTSTATUS: No such user <%s>" % args[0])
                                 
 def receive(cl,socket,events): #return commandname & args
 	buf = ""
@@ -154,15 +150,15 @@ class serverevents:
 	def ondisconnected(self):
 		bad("Disconnected")
 	def onmotd(self,content):
-		print blue+"** MOTD ** "+content+normal
+		Log.Info( "[MOTD] "+content )
 	def onsaid(self,channel,user,message):
-		print cyan+"#"+channel+"\t<"+user+">"+normal+message
+		Log.Info( "[CHANNEL] %s: <%s> %s"%(channel,user,message) )
 	def onsaidex(self,channel,user,message):
-		print magenta+"#"+channel+"\t<"+user+">"+normal+message
+		Log.Info( "[CHANNELEX] %s: <%s> %s"%(channel,user,message) )
 	def onsaidprivate(self,user,message):
-		print cyan+"$PRIVATE\t<"+user+">"+normal+message
+		Log.Info( "[PRIVATE] <%s> %s"%(user,message) )
 	def onloggedin(self,socket):
-		print blue+"Logged in."+normal
+		Log.Info( "[LOGIN] successful")
 	def onpong(self):
 		#print blue+"PONG"+normal
 		pass
@@ -213,10 +209,8 @@ class tasclient:
 			except SystemExit:
 				raise SystemExit(0)
 			except:
-				print red+"Command Error"
-				print '-'*60
-				traceback.print_exc(file=sys.stdout)
-				print '-'*60
+				error("Command Error")
+				Log.Error( traceback.print_exc(file=sys.stdout) )
 	def __init__(self,app):
 		self.events = serverevents()
 		self.main = app
@@ -242,13 +236,10 @@ class tasclient:
 			except:
 				self.main.connected = False
 				error("Cannot connect, retrying in 40 secs...")
-				print '-'*60
-				traceback.print_exc(file=sys.stdout)
-				print '-'*60
+				Log.Error( traceback.print_exc(file=sys.stdout) )
 				if self.er == 1:
 					raise SystemExit(0)
-				time.sleep(40.0)
-		
+				time.sleep(40.0)		
 		
 	def disconnect(self,hard=False):
 		try:

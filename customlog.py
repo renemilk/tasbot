@@ -25,7 +25,7 @@ class CLog:
 		if prefix:
 			msg = '[%s] %s'%(prefix,msg)
 		if not self.initialised:
-			sys.stderr.write( msg + 'Logger not initialised\n' )
+			sys.stderr.write( str(msg) + 'Logger not initialised\n' )
 			return
 		now = datetime.datetime.now()
 		msg = "%s:\t%s\n"%(now,msg)
@@ -38,7 +38,7 @@ class CLog:
 		if prefix:
 			msg = '[%s] %s'%(prefix,msg)
 		if not self.initialised:
-			sys.stdout.write( msg + 'Logger not initialised\n' )
+			sys.stdout.write( str(msg) + 'Logger not initialised\n' )
 			return
 		now = datetime.datetime.now()
 		msg = "%s:\t%s\n"%(now,msg)

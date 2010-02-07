@@ -122,5 +122,5 @@ except KeyboardInterrupt:
 	exit(0)
 except:
 	error("parsing command line")
-	Log.Error( traceback.print_exc(file=sys.stdout) )
+	Log.Error( traceback.print_exc() )
 	

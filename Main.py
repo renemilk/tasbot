@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os, sys, string, base64, md5, time, ParseConfig, thread, Plugin, traceback, Client, binascii
 from customlog import *
@@ -89,29 +90,29 @@ class MainApp:
 		notice("Connecting to %s:%i" % (self.config["serveraddr"],int(self.config["serverport"])))
 		self.tasclient.connect(self.config["serveraddr"],int(self.config["serverport"]))
 
-			
-inst = MainApp()
-cf = "Main.conf"
-i = 0
-r = False
-try:
-	for arg in sys.argv:
-		if arg.strip() == "-c":
-			cf = sys.argv[i+1]
-		if arg.strip() == "-r":
-			r = True
-			notice("Registering account")
-		i += 1
-	inst.run(cf,r,True)
-	while 1:
-		time.sleep(10)
-except SystemExit:
-	raise SystemExit(0)
-except KeyboardInterrupt:
-	error("SIGINT, Exiting")
-	inst.ph.onexit()
-	exit(0)
-except:
-	error("parsing command line")
-	Log.Error( traceback.print_exc() )
-	
+if __name__=="__main__":			
+	inst = MainApp()
+	cf = "Main.conf"
+	i = 0
+	r = False
+	try:
+		for arg in sys.argv:
+			if arg.strip() == "-c":
+				cf = sys.argv[i+1]
+			if arg.strip() == "-r":
+				r = True
+				notice("Registering account")
+			i += 1
+		inst.run(cf,r,True)
+		while 1:
+			time.sleep(10)
+	except SystemExit:
+		raise SystemExit(0)
+	except KeyboardInterrupt:
+		error("SIGINT, Exiting")
+		inst.ph.onexit()
+		exit(0)
+	except:
+		error("parsing command line")
+		Log.Error( traceback.print_exc() )
+

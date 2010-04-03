@@ -275,6 +275,16 @@ class tasclient:
 				bad("Failed to send LEAVE command")
 		else:
 			bad("leave(%s) : Not in channel" % channel)
+
+	def join(self,channel):
+		if not channel in self.channels:
+			self.sock.send("JOIN %s\n" % channel)
+				
+	def say(self,channel,phrase):
+		self.join(channel)
+		self.sock.send("SAY %s %s\n" % (channel,phrase) )
+				
+
 	def ping(self):
 		if self.er == 1:
 			return

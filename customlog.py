@@ -30,6 +30,8 @@ class CLog:
 			sys.stderr.write( str(msg) + 'Logger not initialised\n' )
 			return
 		now = datetime.datetime.now()
+		if isinstance( msg, list ):
+			msg = '\n'.join( msg )
 		msg = "%s:\t%s\n"%(now,msg)
 		if self.errors_to_stderr:
 			sys.stderr.write( msg )
@@ -43,6 +45,8 @@ class CLog:
 			sys.stdout.write( str(msg) + 'Logger not initialised\n' )
 			return
 		now = datetime.datetime.now()
+		if isinstance( msg, list ):
+			msg = '\n'.join( msg )
 		msg = "%s:\t%s\n"%(now,msg)
 		if self.info_to_stdout:
 			sys.stdout.write( msg )

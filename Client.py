@@ -22,7 +22,7 @@ class User:
 			self.mod = bool(getmod(int(status)))
 			self.bot = bool(getbot(int(status)))
 			self.rank = getrank(status)-1
-                
+
 def parsecommand(cl,c,args,events,sock):
 	if c.strip() != "":
 		events.oncommandfromserver(c,args,sock)
@@ -38,7 +38,7 @@ def parsecommand(cl,c,args,events,sock):
 				error("I've been kicked from a channel that i haven't joined")
 		if c == "TASSERVER":
 			good("Connected to server")
-			
+
 			if cl.fl.register:
 				cl.register(cl.uname,cl.password)
 				receive(cl,sock,events)
@@ -57,9 +57,9 @@ def parsecommand(cl,c,args,events,sock):
 			error("Login failed ( %s ), trying to register..." % ' '.join(args))
 			notice("Closing Connection")
 			sock.close()
-			cl.fl.register = True			
+			cl.fl.register = True
 			cl.connect(cl.lastserver,cl.lastport)
-			
+
 		if c == "REGISTRATIONACCEPTED":
 			good("Registered")
 			notice("Closing Connection")
@@ -120,7 +120,7 @@ def parsecommand(cl,c,args,events,sock):
 						Log.Error( traceback.format_exc() )
 				else:
 					error("Invalid CLIENTSTATUS: No such user <%s>" % args[0])
-                                
+
 def receive(cl,socket,events): #return commandname & args
 	buf = ""
 	try:
@@ -184,7 +184,7 @@ class tasclient:
 			if self.er == 1:
 				raise SystemExit(0)
 			try:
-				
+
 				#print "Waiting data from socket"
 				result = receive(self,self.sock,self.events)
 				#print "Received data"
@@ -218,7 +218,7 @@ class tasclient:
 	def connect(self,server,port):
 		self.lastserver = server
 		self.lastport = port
-		
+
 		while 1:
 			try:
 				self.sock = socket(AF_INET,SOCK_STREAM)
@@ -239,8 +239,8 @@ class tasclient:
 				Log.Error( traceback.print_exc(file=sys.stdout) )
 				if self.er == 1:
 					raise SystemExit(0)
-				time.sleep(40.0)		
-		
+				time.sleep(40.0)
+
 	def disconnect(self,hard=False):
 		try:
 			self.sock.send("EXIT\n")
@@ -253,7 +253,7 @@ class tasclient:
 		lanip = self.sock.getsockname()[0]
 		#print "LOGIN %s %s %i * %s\n" % (username,password,cpu,client)
 		try:
-			self.sock.send("LOGIN %s %s %i %s %s\t0\t%s\n" % (username,password,cpu,lanip,client,"a"))
+			self.sock.send("LOGIN %s %s %i %s %s\t0\t%s\n" % (username,password,cpu,lanip,client,"a sp"))
 		except:
 			error("Cannot send login command")
 		self.uname = username
@@ -279,11 +279,11 @@ class tasclient:
 	def join(self,channel):
 		if not channel in self.channels:
 			self.sock.send("JOIN %s\n" % channel)
-				
+
 	def say(self,channel,phrase):
 		self.join(channel)
 		self.sock.send("SAY %s %s\n" % (channel,phrase) )
-				
+
 
 	def ping(self):
 		if self.er == 1:
@@ -293,6 +293,3 @@ class tasclient:
 			self.lp = time.time()
 		except:
 			error("Cannot send ping command")
-	
-			
-		

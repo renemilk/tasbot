@@ -124,7 +124,7 @@ if __name__=="__main__":
 			r = True
 			notice("Registering account")
 		i += 1
-	inst = MainApp(configfile,"/tmp/arm.pid",r,True)
+	inst = MainApp(configfile,config['pidfile'],r,True)
 	inst.start()
 	#inst.run()#exec in fg
 

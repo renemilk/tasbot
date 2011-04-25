@@ -112,19 +112,19 @@ class MainApp(Daemon):
 if __name__=="__main__":			
 	#todo get this from config
 	configfile = "Main.conf"
-	config = ParseConfig.readconfigfile(configfile)
+	config = ParseConfig.Config(configfile)
 	Log.Init( config['logfile'], 'info', True )
 	
 	i = 0
 	r = False
 	for arg in sys.argv:
-		if arg.strip() == "-c":
-			cf = sys.argv[i+1]
 		if arg.strip() == "-r":
 			r = True
 			notice("Registering account")
 		i += 1
-	inst = MainApp(configfile,config['pidfile'],r,True)
+	pidfile = config['pidfile']
+	print 'using pidfile %s'%pidfile
+	inst = MainApp(configfile,pidfile,r,True)
 	inst.start()
 	#inst.run()#exec in fg
 

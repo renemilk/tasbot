@@ -27,7 +27,10 @@ class plghandler:
 			bad("Plugin %s is already loaded" % name)
 			return
 		try:
-			code = __import__(name)
+			try:
+				code = __import__(name)
+			except ImportError:
+				code = __import__('plugins.%s'%name)
 		except:
 			error("Cannot load plugin   "+name)
 			Log.Error( traceback.print_exc() )

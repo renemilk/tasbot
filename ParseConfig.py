@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import string, traceback, os
 from customlog import *
+import os.path
 
 def readconfigfile(filename):
 	entries = dict()
@@ -40,7 +41,7 @@ def parselist(string,sep):
 	j = string.split(sep)
 	l = []
 	for i in j:
-		l.append(i.strip())
+		l.append(os.path.expandvars(i.strip()))
 	return l
 			
 class Config:
@@ -50,7 +51,7 @@ class Config:
 
 	def GetSingleOption( self, key, default ):
 		if key in self.config:
-			return self.config[key]
+			return os.path.expandvars(self.config[key])
 		return default
 
 	def GetOptionList( self, key, seperator=',',default=[] ):

@@ -4,6 +4,7 @@ import sys
 import traceback
 import inspect
 import ctypes
+import plugins
 def _async_raise(tid, exctype):
     '''Raises an exception in the threads with id tid'''
     if not inspect.isclass(exctype):
@@ -31,9 +32,9 @@ class plghandler:
 				code = __import__(name)
 			except ImportError:
 				code = __import__('plugins.%s'%name)
-		except:
+		except ImportError, imp:
 			error("Cannot load plugin   "+name)
-			Log.Error( traceback.print_exc() )
+			Log.Except( imp )
 			return
 		
 		self.plugins.update([(name,code.Main())])

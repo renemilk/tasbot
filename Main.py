@@ -94,10 +94,8 @@ class MainApp(Daemon):
 	def run(self):
 		while 1:
 			try:
-				print "KKO"
 				notice("Connecting to %s:%i" % (self.config["serveraddr"],int(self.config["serverport"])))
 				self.tasclient.connect(self.config["serveraddr"],int(self.config["serverport"]))
-			
 				while 1:
 					time.sleep(10)
 			except SystemExit:
@@ -106,15 +104,17 @@ class MainApp(Daemon):
 				error("SIGINT, Exiting")
 				inst.ph.onexit()
 				return
-			except:
+			except Exception, e:
 				error("parsing command line")
-				Log.Error( traceback.print_exc() )
+				Log.Except( e )
+			time.sleep(10)
 
 if __name__=="__main__":			
 	#todo get this from config
-	Log.Init( 'stdout.log', 'stderr.log' )
+	configfile = "Main.conf"
+	config = ParseConfig.readconfigfile(configfile)
+	Log.Init( config['logfile'], 'info', True )
 	
-	cf = "Main.conf"
 	i = 0
 	r = False
 	for arg in sys.argv:
@@ -124,6 +124,7 @@ if __name__=="__main__":
 			r = True
 			notice("Registering account")
 		i += 1
-	inst = MainApp(cf,"/tmp/arm.pid",r,True)
+	inst = MainApp(configfile,"/tmp/arm.pid",r,True)
 	inst.start()
+	#inst.run()#exec in fg
 

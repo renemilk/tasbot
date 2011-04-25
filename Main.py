@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os, sys, string, base64, md5, time, ParseConfig, thread, Plugin, traceback, Client, binascii
+import os, sys, string, base64, hashlib, time, ParseConfig, thread, Plugin, traceback, Client, binascii
 from customlog import *
 from daemon import Daemon
 
@@ -9,31 +9,31 @@ class MainApp(Daemon):
 		while self.er == 0:
 			self.tasclient.ping()
 			time.sleep(10)
-		raise SystemExit(0)	
+		raise SystemExit(0)
 	def onlogin(self,socket):
 		if self.firstconnect == 1:
 			thread.start_new_thread(self.tasclient.mainloop,())
 			thread.start_new_thread(self.PingLoop,())
 			self.firstconnect = 0
-		
-		#self.tasclient.events.ondisconnected = self.ph.ondisconnected 
-		
-		self.tasclient.events.onmotd = self.ph.onmotd  
-		self.tasclient.events.onsaid = self.ph.onsaid 
-		self.tasclient.events.onsaidex = self.ph.onsaidex 
-		self.tasclient.events.onsaidprivate = self.ph.onsaidprivate 
-		self.tasclient.events.onpong = self.ph.onpong 
+
+		#self.tasclient.events.ondisconnected = self.ph.ondisconnected
+
+		self.tasclient.events.onmotd = self.ph.onmotd
+		self.tasclient.events.onsaid = self.ph.onsaid
+		self.tasclient.events.onsaidex = self.ph.onsaidex
+		self.tasclient.events.onsaidprivate = self.ph.onsaidprivate
+		self.tasclient.events.onpong = self.ph.onpong
 		self.tasclient.events.oncommandfromserver = self.ph.oncommandfromserver
 		self.tasclient.events.ondisconnected = self.ph.ondisconnected
-		
+
 		self.ph.onloggedin(socket)
 		self.ph.oncommandfromserver("ACCEPTED",[],self.tasclient.sock)
 		self.connected = True
 		good("Logged in")
-		
+
 	def SaveConfig(self):
 		ParseConfig.writeconfigfile(self.configfile,self.config)
-		
+
 	def isAdmin(self,username):
 		if username in self.admins:
 				return True
@@ -44,32 +44,32 @@ class MainApp(Daemon):
 						return False
 		else:
 				return False
-	                
+
 	def Dologin(self):
 		if self.tasclient.fl.register:
 			notice("Not logging in because a registration is in progress")
 			return
 		if self.verbose:
 			notice("Logging in...")
-		m = md5.new()
+		m = hashlib.md5()
 		m.update(self.config["password"])
 		phash = base64.b64encode(binascii.a2b_hex(m.hexdigest()))
 		self.tasclient.login(self.config["nick"],phash,"Newbot",2400,self.config["lanip"] if "lanip" in self.config else "*")
-		
+
 	def Register(self,username,password):
-		m = md5.new()
+		m = hashlib.md5()
 		m.update(self.config["password"])
 		self.tasclient.register(self.config["nick"],base64.b64encode(binascii.a2b_hex(m.hexdigest())))
-		
+
 	def destroy(self):
 		self.tasclient.er = 1
 		self.er = 1
 		raise SystemExit(0)
-	
-	def ReloadConfig(self):	
+
+	def ReloadConfig(self):
 		self.config = ParseConfig.readconfigfile(self.configfile)
 		self.admins = ParseConfig.parselist(self.config["admins"],",")
-		
+
 	def __init__(self,configfile,pidfile,register,verbose):
 		super(MainApp, self).__init__(pidfile)
 		self.firstconnect = 1
@@ -82,7 +82,7 @@ class MainApp(Daemon):
 		self.admins = ParseConfig.parselist(self.config["admins"],",")
 		self.verbose = verbose
 		self.tasclient = Client.tasclient(self)
-		
+
 		for p in ParseConfig.parselist(self.config["plugins"],","):
 			self.ph.addplugin(p,self.tasclient)
 
@@ -90,7 +90,7 @@ class MainApp(Daemon):
 		self.tasclient.events.onconnected = self.Dologin
 		self.tasclient.events.onloggedin = self.onlogin
 		self.reg = register
-		
+
 	def run(self):
 		while 1:
 			try:
@@ -109,12 +109,12 @@ class MainApp(Daemon):
 				Log.Except( e )
 			time.sleep(10)
 
-if __name__=="__main__":			
+if __name__=="__main__":
 	#todo get this from config
 	configfile = "Main.conf"
 	config = ParseConfig.Config(configfile)
 	Log.Init( config['logfile'], 'info', True )
-	
+
 	i = 0
 	r = False
 	for arg in sys.argv:

@@ -102,29 +102,9 @@ class MainApp(Daemon):
 				return
 			except KeyboardInterrupt:
 				error("SIGINT, Exiting")
-				inst.ph.onexit()
+				self.ph.onexit()
 				return
 			except Exception, e:
 				error("parsing command line")
 				Log.Except( e )
 			time.sleep(10)
-
-if __name__=="__main__":			
-	#todo get this from config
-	configfile = "Main.conf"
-	config = ParseConfig.Config(configfile)
-	Log.Init( config['logfile'], 'info', True )
-	
-	i = 0
-	r = False
-	for arg in sys.argv:
-		if arg.strip() == "-r":
-			r = True
-			notice("Registering account")
-		i += 1
-	pidfile = config['pidfile']
-	print 'using pidfile %s'%pidfile
-	inst = MainApp(configfile,pidfile,r,True)
-	inst.start()
-	#inst.run()#exec in fg
-

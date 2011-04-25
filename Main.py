@@ -2,13 +2,9 @@
 # -*- coding: utf-8 -*-
 import os, sys, string, base64, md5, time, ParseConfig, thread, Plugin, traceback, Client, binascii
 from customlog import *
+from daemon import Daemon
 
-class MainApp:
-	firstconnect = 1
-	er = 0
-	configfile = ""
-	reg = False
-	connected = False
+class MainApp(Daemon):
 	def PingLoop(self):
 		while self.er == 0:
 			self.tasclient.ping()
@@ -34,18 +30,21 @@ class MainApp:
 		self.ph.oncommandfromserver("ACCEPTED",[],self.tasclient.sock)
 		self.connected = True
 		good("Logged in")
+		
 	def SaveConfig(self):
 		ParseConfig.writeconfigfile(self.configfile,self.config)
+		
 	def isAdmin(self,username):
-	        if username in self.admins:
-	                return True
-	        elif username in self.tasclient.users:
-	                if "#"+str(self.tasclient.users[username].id) in self.admins:
-	                        return True
-	                else:
-	                        return False
-	        else:
-	                return False
+		if username in self.admins:
+				return True
+		elif username in self.tasclient.users:
+				if "#"+str(self.tasclient.users[username].id) in self.admins:
+						return True
+				else:
+						return False
+		else:
+				return False
+	                
 	def Dologin(self):
 		if self.tasclient.fl.register:
 			notice("Not logging in because a registration is in progress")
@@ -56,19 +55,26 @@ class MainApp:
 		m.update(self.config["password"])
 		phash = base64.b64encode(binascii.a2b_hex(m.hexdigest()))
 		self.tasclient.login(self.config["nick"],phash,"Newbot",2400,self.config["lanip"] if "lanip" in self.config else "*")
+		
 	def Register(self,username,password):
 		m = md5.new()
 		m.update(self.config["password"])
 		self.tasclient.register(self.config["nick"],base64.b64encode(binascii.a2b_hex(m.hexdigest())))
+		
 	def destroy(self):
 		self.tasclient.er = 1
 		self.er = 1
 		raise SystemExit(0)
-	def ReloadConfig(self):
-		
+	
+	def ReloadConfig(self):	
 		self.config = ParseConfig.readconfigfile(self.configfile)
 		self.admins = ParseConfig.parselist(self.config["admins"],",")
-	def run(self,configfile,register=False,verbose=False):
+		
+	def __init__(self,configfile,pidfile,register,verbose):
+		super(MainApp, self).__init__(pidfile)
+		self.firstconnect = 1
+		self.er = 0
+		self.connected = False
 		self.cwd = os.getcwd()
 		self.ph = Plugin.plghandler(self)
 		self.configfile = configfile
@@ -80,39 +86,44 @@ class MainApp:
 		for p in ParseConfig.parselist(self.config["plugins"],","):
 			self.ph.addplugin(p,self.tasclient)
 
-		#todo get this from config
-		Log.Init( 'stdout.log', 'stderr.log' )
-
 		self.tasclient.events.onconnectedplugin = self.ph.onconnected
 		self.tasclient.events.onconnected = self.Dologin
 		self.tasclient.events.onloggedin = self.onlogin
 		self.reg = register
-		notice("Connecting to %s:%i" % (self.config["serveraddr"],int(self.config["serverport"])))
-		self.tasclient.connect(self.config["serveraddr"],int(self.config["serverport"]))
+		
+	def run(self):
+		while 1:
+			try:
+				print "KKO"
+				notice("Connecting to %s:%i" % (self.config["serveraddr"],int(self.config["serverport"])))
+				self.tasclient.connect(self.config["serveraddr"],int(self.config["serverport"]))
+			
+				while 1:
+					time.sleep(10)
+			except SystemExit:
+				return
+			except KeyboardInterrupt:
+				error("SIGINT, Exiting")
+				inst.ph.onexit()
+				return
+			except:
+				error("parsing command line")
+				Log.Error( traceback.print_exc() )
 
 if __name__=="__main__":			
-	inst = MainApp()
+	#todo get this from config
+	Log.Init( 'stdout.log', 'stderr.log' )
+	
 	cf = "Main.conf"
 	i = 0
 	r = False
-	try:
-		for arg in sys.argv:
-			if arg.strip() == "-c":
-				cf = sys.argv[i+1]
-			if arg.strip() == "-r":
-				r = True
-				notice("Registering account")
-			i += 1
-		inst.run(cf,r,True)
-		while 1:
-			time.sleep(10)
-	except SystemExit:
-		raise SystemExit(0)
-	except KeyboardInterrupt:
-		error("SIGINT, Exiting")
-		inst.ph.onexit()
-		exit(0)
-	except:
-		error("parsing command line")
-		Log.Error( traceback.print_exc() )
+	for arg in sys.argv:
+		if arg.strip() == "-c":
+			cf = sys.argv[i+1]
+		if arg.strip() == "-r":
+			r = True
+			notice("Registering account")
+		i += 1
+	inst = MainApp(cf,"/tmp/arm.pid",r,True)
+	inst.start()
 

@@ -5,3 +5,5 @@ admins=YOURNICK;
 plugins=;
 password=YOURPASSWORD;
 nick=BOT_NICK;
+logfile=$HOME/mybot.log;
+pidfile=$HOME/mybot.pid;

@@ -27,6 +27,15 @@ import time
 
 from signal import SIGTERM 
 
+def check_pid(pid):        
+    """ Check For the existence of a unix pid. """
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        return False
+    else:
+        return True
+
 class Daemon(object):
 	"""
 	A generic daemon class.
@@ -108,9 +117,20 @@ class Daemon(object):
 			pid = None
 	
 		if pid:
-			message = "pidfile %s already exists. Is it already running?\n"
-			sys.stderr.write(message % self.pidfile)
-			sys.exit(1)
+			if check_pid(pid):
+				message = "pidfile %s already exists. Is it already running?\n"
+				sys.stderr.write(message % self.pidfile)
+				sys.exit(1)
+			else:
+				try:
+					os.remove( self.pidfile )
+					message = "removed stale pidfile %s"
+					sys.stderr.write(message % self.pidfile)
+				except:
+					message = "failed to remove stale pidfile %s with no corresponding process"
+					sys.stderr.write(message % self.pidfile)
+					sys.exit(1)
+					
 
 		# Start the daemon
 		self.daemonize()		

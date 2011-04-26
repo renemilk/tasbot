@@ -48,6 +48,8 @@ class CLog:
 	def Error(self, msg,prefix=None):
 		self.logger.error( self._prepare( msg ) )
 
+	def Debug(self, msg,prefix=None):
+		self.logger.debug( self._prepare( msg ) )
 	def Info(self, msg,prefix=None):
 		self.logger.info( self._prepare( msg ) )
 		

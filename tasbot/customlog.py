@@ -55,20 +55,21 @@ class CLog:
 		
 	def Except(self,e):
 		self.logger.exception( e )
+	
+	def loaded(self,t):
+		self.Info( t, "LOADED" )
+
+	def reloaded(self,t):
+		self.Info( t, "RELOADED" )
+
+	def notice(self,t):
+		self.Info( t )
+
+	def good(self,t):
+		self.Info( t, "GOOD" )
+
+	def bad(self,t):
+		self.Error( t,"BAD" )
 
 Log = CLog()
 
-def loaded(t, log=Log):
-	log.Info( t, "LOADED" )
-
-def reloaded(t, log=Log):
-	log.Info( t, "RELOADED" )
-
-def notice(t, log=Log):
-	log.Info( t )
-
-def good(t, log=Log):
-	log.Info( t, "GOOD" )
-
-def bad(t, log=Log):
-	log.Error( t,"BAD" )

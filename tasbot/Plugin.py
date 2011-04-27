@@ -25,7 +25,7 @@ class plghandler:
 		self.app = main
 	def addplugin(self,name,tasc):
 		if name in self.plugins:
-			bad("Plugin %s is already loaded" % name)
+			Log.bad("Plugin %s is already loaded" % name)
 			return
 		try:
 			code = __import__(name)
@@ -49,7 +49,7 @@ class plghandler:
 		except Exception, e:
 			Log.Except( e )
 			return
-		loaded("Plugin " + name)
+		Log.loaded("Plugin " + name)
 	def unloadplugin(self,name):
 		if not name in self.plugins:
 			Log.Error("Plugin %s not loaded"%name)
@@ -57,12 +57,12 @@ class plghandler:
 		try:
 			if "ondestroy" in dir(self.plugins[name]):
 				self.plugins[name].ondestroy()
-			notice("Killing any threads spawned by the plugin...")
+			Log.notice("Killing any threads spawned by the plugin...")
 			for tid in self.pluginthreads[name]:
 				_async_raise(tid,SystemExit)
 			self.pluginthreads.pop(name)
 			self.plugins.pop(name)
-			notice("%s Unloaded" % name)
+			Log.notice("%s Unloaded" % name)
 		except:
 			Log.Error("Cannot unload plugin   "+name)
 			Log.Error("Use forceunload to remove it anyway")
@@ -73,7 +73,7 @@ class plghandler:
 			Log.Error("Plugin %s not loaded"%name)
 			return
 		self.plugins.pop(name)
-		bad("%s Unloaded(Forced)" % name)
+		Log.bad("%s UnLog.loaded(Forced)" % name)
 	def reloadplugin(self,name):
 		if not name in self.plugins:
 			Log.Error("Plugin %s not loaded"%name)
@@ -81,7 +81,7 @@ class plghandler:
 		try:
 			if "ondestroy" in dir(self.plugins[name]):
 				self.plugins[name].ondestroy()
-			notice("%s Unloaded" % name)
+			Log.notice("%s Unloaded" % name)
 		except:
 			Log.Error("Cannot unload plugin   "+name)
 			Log.Error("Use forceunload to remove it anyway")
@@ -91,7 +91,7 @@ class plghandler:
 		except:
 			Log.Error("Cannot reload plugin %s!" % name)
 			return
-		notice("Killing any threads spawned by the plugin...")
+		Log.notice("Killing any threads spawned by the plugin...")
 		for tid in self.pluginthreads[name]:
 			_async_raise(tid,SystemExit)
 		self.plugins.update([(name,code.Main())])
@@ -107,7 +107,7 @@ class plghandler:
 			Log.Error("Cannot load plugin   "+name)
 			Log.Error( traceback.print_exc() )
 			return
-		loaded("Plugin " + name)
+		Log.loaded("Plugin " + name)
 
 	def onconnected(self):
 		for plugin in self.plugins:
@@ -172,21 +172,21 @@ class plghandler:
 			try:
 				self.unloadplugin(args[1])
 			except:
-				bad("Unloadplugin failed")
+				Log.bad("Unloadplugin failed")
 				Log.Error( traceback.print_exc() )
 
 		if args[0].lower() == "!loadplugin" and user in self.app.admins and len(args) == 2:
 			try:
 				self.addplugin(args[1],self.app.tasclient)
 			except:
-				bad("addplugin failed")
+				Log.bad("addplugin failed")
 				Log.Error( traceback.print_exc() )
 
 		if args[0].lower() == "!reloadplugin" and user in self.app.admins and len(args) == 2:
 			try:
 				self.reloadplugin(args[1])
 			except:
-				bad("Unloadplugin failed")
+				Log.bad("Unloadplugin failed")
 				Log.Error( traceback.print_exc() )
 
 		for plugin in self.plugins:

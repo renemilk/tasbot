@@ -29,15 +29,15 @@ def parsecommand(cl,c,args,events,sock):
 		if c == "JOIN" and len(args) >= 1:
 			if not args[0] in cl.channels:
 				cl.channels.append(args[0])
-				good("Joined #"+args[0])
+				Log.good("Joined #"+args[0])
 		if c == "FORCELEAVECHANNEL" and len(args) >= 2:
 			if args[0] in cl.channels:
 				cl.channels.remove(args[0])
-				bad("I've been kicked from #%s by <%s>" % (args[0],args[1]))
+				Log.bad("I've been kicked from #%s by <%s>" % (args[0],args[1]))
 			else:
-				error("I've been kicked from a channel that i haven't joined")
+				Log.Error("I've been kicked from a channel that i haven't joined")
 		if c == "TASSERVER":
-			good("Connected to server")
+			Log.good("Connected to server")
 
 			if cl.fl.register:
 				cl.register(cl.uname,cl.password)
@@ -45,7 +45,7 @@ def parsecommand(cl,c,args,events,sock):
 			else:
 				events.onconnected()
 		if c == "AGREEMENTEND":
-			notice("accepting agreement")
+			Log.notice("accepting agreement")
 			sock.send("CONFIRMAGREEMENT\n")
 			cl.login(cl.uname,cl.password,"BOT",2000)
 			events.onloggedin(sock)
@@ -54,15 +54,15 @@ def parsecommand(cl,c,args,events,sock):
 		if c == "ACCEPTED":
 			events.onloggedin(sock)
 		if c == "DENIED" and ' '.join(args).lower().count("already") == 0:
-			error("Login failed ( %s ), trying to register..." % ' '.join(args))
-			notice("Closing Connection")
+			Log.Error("Login failed ( %s ), trying to register..." % ' '.join(args))
+			Log.notice("Closing Connection")
 			sock.close()
 			cl.fl.register = True
 			cl.connect(cl.lastserver,cl.lastport)
 
 		if c == "REGISTRATIONACCEPTED":
-			good("Registered")
-			notice("Closing Connection")
+			Log.good("Registered")
+			Log.notice("Closing Connection")
 			sock.close()
 			cl.fl.register = False
 			cl.connect(cl.lastserver,cl.lastport)
@@ -73,19 +73,19 @@ def parsecommand(cl,c,args,events,sock):
 			try:
 				cl.users[args[1]].battleid = int(args[0])
 			except:
-				error("Invalid JOINEDBATTLE Command from server: %s %s"%(c,str(args)))
+				Log.Error("Invalid JOINEDBATTLE Command from server: %s %s"%(c,str(args)))
 				Log.Error( traceback.format_exc() )
 		if c == "BATTLEOPENED" and len(args) >= 4:
 			try:
 				cl.users[args[3]].battleid = int(args[0])
 			except:
-				error("Invalid BATTLEOPENED Command from server: %s %s"%(c,str(args)))
+				Log.Error("Invalid BATTLEOPENED Command from server: %s %s"%(c,str(args)))
 				Log.Error( traceback.format_exc() )
 		if c == "LEFTBATTLE" and len(args) >= 2:
 			try:
 				cl.users[args[1]].battleid = -1
 			except:
-				error("Invalid LEFTBATTLE Command from server: %s %s"%(c,str(args)))
+				Log.Error("Invalid LEFTBATTLE Command from server: %s %s"%(c,str(args)))
 				Log.Error( traceback.format_exc() )
 		if c == "SAIDPRIVATE" and len(args) >= 2:
 			events.onsaidprivate(args[0],' '.join(args[1:]))
@@ -93,34 +93,34 @@ def parsecommand(cl,c,args,events,sock):
 			try:
 				if len(args) == 4:#Account id
 					cl.users[args[0]] = User(args[0],int(args[3]),args[1],int(args[2]))
-					#notice(args[0]+":"+args[3])
+					#Log.notice(args[0]+":"+args[3])
 				elif len(args) == 3:
 					cl.users[args[0]] = User(args[0],int(-1),args[1],int(args[2]))
-					#notice(args[0]+":"+"-1")
+					#Log.notice(args[0]+":"+"-1")
 				else:
-					error("Invalid ADDUSER Command from server: %s %s"%(c,str(args)))
+					Log.Error("Invalid ADDUSER Command from server: %s %s"%(c,str(args)))
 				Log.Debug('ADDUSER %d args: '%len(cl.users) + ' '.join( args ) )
 			except:
-				error("Invalid ADDUSER Command from server: %s %s"%(c,str(args)))
+				Log.Error("Invalid ADDUSER Command from server: %s %s"%(c,str(args)))
 				Log.Error( traceback.format_exc() )
 		if c == "REMOVEUSER":
 			if len(args) == 1:
 				if args[0] in cl.users:
 					del cl.users[args[0]]
 				else:
-					error("Invalid REMOVEUSER Command: no such user"+args[0])
+					Log.Error("Invalid REMOVEUSER Command: no such user"+args[0])
 			else:
-					error("Invalid REMOVEUSER Command: not enough arguments")
+					Log.Error("Invalid REMOVEUSER Command: not enough arguments")
 		if c == "CLIENTSTATUS":
 			if len(args) == 2:
 				if args[0] in cl.users:
 					try:
 						cl.users[args[0]].clientstatus(int(args[1]))
 					except:
-						error("Malformed CLIENTSTATUS")
+						Log.Error("Malformed CLIENTSTATUS")
 						Log.Error( traceback.format_exc() )
 				else:
-					error("Invalid CLIENTSTATUS: No such user <%s>" % args[0])
+					Log.Error("Invalid CLIENTSTATUS: No such user <%s>" % args[0])
 
 def receive(cl,socket,events): #return commandname & args
 	buf = ""
@@ -132,10 +132,10 @@ def receive(cl,socket,events): #return commandname & args
 				return 1
 			buf += nbuf
 			if len(buf) > 1024*200:
-			  error("Buffer size exceeded!!!")
+			  Log.Error("Buffer size exceeded!!!")
 			  return 1
 	except:
-		error("Connection Broken")
+		Log.Error("Connection Broken")
 		return 1 # Connection broken
 	commands = buf.strip("\r ").split("\n")
 	for cmd in commands:
@@ -145,11 +145,11 @@ def receive(cl,socket,events): #return commandname & args
 	return 0
 class ServerEvents:
 	def onconnected(self):
-		good("Connected to TASServer")
+		Log.good("Connected to TASServer")
 	def onconnectedplugin(self):
-		good("Connected to TASServer")
+		Log.good("Connected to TASServer")
 	def ondisconnected(self):
-		bad("Disconnected")
+		Log.bad("Disconnected")
 	def onmotd(self,content):
 		Log.Info( "[MOTD] "+content )
 	def onsaid(self,channel,user,message):
@@ -210,7 +210,7 @@ class Tasclient:
 			except SystemExit:
 				raise SystemExit(0)
 			except:
-				error("Command Error")
+				Log.Error("Command Error")
 				Log.Error( traceback.print_exc(file=sys.stdout) )
 	def __init__(self,app):
 		self.events = ServerEvents()
@@ -227,7 +227,7 @@ class Tasclient:
 				self.sock.connect((server,int(port)))
 				self.events.onconnectedplugin()
 				if self.main.reg:
-					notice("Registering nick")
+					Log.notice("Registering nick")
 					self.main.Register(self.main.config["nick"],self.main.config["password"])
 				res = receive(self,self.sock,self.events)
 				if not res == 1:
@@ -236,7 +236,7 @@ class Tasclient:
 				raise SystemExit(0)
 			except:
 				self.main.connected = False
-				error("Cannot connect, retrying in 40 secs...")
+				Log.Error("Cannot connect, retrying in 40 secs...")
 				Log.Error( traceback.print_exc(file=sys.stdout) )
 				if self.er == 1:
 					raise SystemExit(0)
@@ -250,32 +250,32 @@ class Tasclient:
 		self.sock.close()
 		self.sock = 0
 	def login(self,username,password,client,cpu,lanip="*"):
-		notice("Trying to login with username %s " % (username))
+		Log.notice("Trying to login with username %s " % (username))
 		lanip = self.sock.getsockname()[0]
 		#print "LOGIN %s %s %i * %s\n" % (username,password,cpu,client)
 		try:
 			self.sock.send("LOGIN %s %s %i %s %s\t0\t%s\n" % (username,password,cpu,lanip,client,"a sp"))
 		except:
-			error("Cannot send login command")
+			Log.Error("Cannot send login command")
 		self.uname = username
 		self.password = password
 		self.channels = []
 		receive(self,self.sock,self.events)
 	def register(self,username,password):
 		try:
-			notice("Trying to register account")
+			Log.notice("Trying to register account")
 			self.sock.send("REGISTER %s %s\n" % (username,password))
 		except:
-			error("Cannot send register command")
+			Log.Error("Cannot send register command")
 	def leave(self,channel): #Leaves a channel
 		if channel in self.channels:
 			try:
 				self.sock.send("LEAVE %s\n" % channel)
 				self.channels.remove(channel)
 			except:
-				bad("Failed to send LEAVE command")
+				Log.bad("Failed to send LEAVE command")
 		else:
-			bad("leave(%s) : Not in channel" % channel)
+			Log.bad("leave(%s) : Not in channel" % channel)
 
 	def join(self,channel):
 		if not channel in self.channels:
@@ -293,4 +293,4 @@ class Tasclient:
 			self.sock.send("PING\n")
 			self.lp = time.time()
 		except:
-			error("Cannot send ping command")
+			Log.Error("Cannot send ping command")

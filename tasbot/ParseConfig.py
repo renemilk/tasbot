@@ -8,7 +8,7 @@ def readconfigfile(filename):
 	try:
 		f = open(filename,"r")
 	except:
-		error("Error reading config file "+filename)
+		Log.Error("Error reading config file "+filename)
 		return entries
 	s1 = f.read()
 	s2 = ""
@@ -28,8 +28,8 @@ def readconfigfile(filename):
 		if len(ed) >= 2:
 			entries.update([(ed[0].lower().strip(" \n\r\t;").replace("\r\n",""),"=".join(ed[1:]).strip(" \n\r\t;").replace("\r\n",""))])
 		else:
-			error("Invalid line on config file %s :\n\t%s" % ( filename , entry ) + normal)
-	#good("Loaded config file %s succesfully, %i entries" % (filename,len(entries)))
+			Log.Error("Invalid line on config file %s :\n\t%s" % ( filename , entry ) + normal)
+	#Log.good("Loaded config file %s succesfully, %i entries" % (filename,len(entries)))
 	return entries
 def writeconfigfile(filename,entries):
 	f = open(filename,"w")

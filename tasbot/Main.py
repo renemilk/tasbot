@@ -29,7 +29,7 @@ class MainApp(Daemon):
 		self.ph.onloggedin(socket)
 		self.ph.oncommandfromserver("ACCEPTED",[],self.tasclient.sock)
 		self.connected = True
-		good("Logged in")
+		Log.good("Logged in")
 
 	def SaveConfig(self):
 		ParseConfig.writeconfigfile(self.configfile,self.config)
@@ -47,10 +47,10 @@ class MainApp(Daemon):
 
 	def Dologin(self):
 		if self.tasclient.flags.register:
-			notice("Not logging in because a registration is in progress")
+			Log.notice("Not logging in because a registration is in progress")
 			return
 		if self.verbose:
-			notice("Logging in...")
+			Log.notice("Logging in...")
 		m = hashlib.md5()
 		m.update(self.config["password"])
 		phash = base64.b64encode(binascii.a2b_hex(m.hexdigest()))
@@ -94,17 +94,17 @@ class MainApp(Daemon):
 	def run(self):
 		while 1:
 			try:
-				notice("Connecting to %s:%i" % (self.config["serveraddr"],int(self.config["serverport"])))
+				Log.notice("Connecting to %s:%i" % (self.config["serveraddr"],int(self.config["serverport"])))
 				self.tasclient.connect(self.config["serveraddr"],int(self.config["serverport"]))
 				while 1:
 					time.sleep(10)
 			except SystemExit:
 				return
 			except KeyboardInterrupt:
-				error("SIGINT, Exiting")
+				Log.Error("SIGINT, Exiting")
 				self.ph.onexit()
 				return
 			except Exception, e:
-				error("parsing command line")
+				Log.Error("parsing command line")
 				Log.Except( e )
 			time.sleep(10)

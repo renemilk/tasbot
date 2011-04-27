@@ -46,7 +46,7 @@ class MainApp(Daemon):
 				return False
 
 	def Dologin(self):
-		if self.tasclient.fl.register:
+		if self.tasclient.flags.register:
 			notice("Not logging in because a registration is in progress")
 			return
 		if self.verbose:
@@ -62,7 +62,7 @@ class MainApp(Daemon):
 		self.tasclient.register(self.config["nick"],base64.b64encode(binascii.a2b_hex(m.hexdigest())))
 
 	def destroy(self):
-		self.tasclient.er = 1
+		self.tasclient.error = 1
 		self.er = 1
 		raise SystemExit(0)
 
@@ -81,7 +81,7 @@ class MainApp(Daemon):
 		self.config = ParseConfig.readconfigfile(configfile)
 		self.admins = ParseConfig.parselist(self.config["admins"],",")
 		self.verbose = verbose
-		self.tasclient = Client.tasclient(self)
+		self.tasclient = Client.Tasclient(self)
 
 		for p in ParseConfig.parselist(self.config["plugins"],","):
 			self.ph.addplugin(p,self.tasclient)

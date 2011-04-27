@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from customlog import *
+from customlog import Log
 import sys
 import traceback
 import inspect
@@ -11,7 +11,7 @@ def _async_raise(tid, exctype):
         raise TypeError("Only types can be raised (not instances)")
     res = ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, ctypes.py_object(exctype))
     if res == 0:
-        error("Cannot kill thread %i" % tid)
+        Log.Error("Cannot kill thread %i" % tid)
     if res != 1:
         # """if it returns a number greater than one, you're in trouble, 
         # and you should call it again with exc=NULL to revert the effect"""
@@ -30,7 +30,7 @@ class plghandler:
 		try:
 			code = __import__(name)
 		except ImportError, imp:
-			error("Cannot load plugin   "+name)
+			Log.Error("Cannot load plugin   "+name)
 			Log.Except( imp )
 			return
 		
@@ -46,14 +46,13 @@ class plghandler:
 				self.plugins[name].onload(tasc)
 			if "onloggedin" in dir(self.plugins[name]) and self.app.connected:
 				self.plugins[name].onloggedin(tasc.sock)
-		except:
-			error("Cannot load plugin   "+name)
-			Log.Error( traceback.print_exc() )
+		except Exception, e:
+			Log.Except( e )
 			return
 		loaded("Plugin " + name)
 	def unloadplugin(self,name):
 		if not name in self.plugins:
-			error("Plugin %s not loaded"%name)
+			Log.Error("Plugin %s not loaded"%name)
 			return
 		try:
 			if "ondestroy" in dir(self.plugins[name]):
@@ -65,32 +64,32 @@ class plghandler:
 			self.plugins.pop(name)
 			notice("%s Unloaded" % name)
 		except:
-			error("Cannot unload plugin   "+name)
-			error("Use forceunload to remove it anyway")
+			Log.Error("Cannot unload plugin   "+name)
+			Log.Error("Use forceunload to remove it anyway")
 			Log.Error( traceback.print_exc() )
 
 	def forceunloadplugin(self,name,tasc):
 		if not name in self.plugins:
-			error("Plugin %s not loaded"%name)
+			Log.Error("Plugin %s not loaded"%name)
 			return
 		self.plugins.pop(name)
 		bad("%s Unloaded(Forced)" % name)
 	def reloadplugin(self,name):
 		if not name in self.plugins:
-			error("Plugin %s not loaded"%name)
+			Log.Error("Plugin %s not loaded"%name)
 			return
 		try:
 			if "ondestroy" in dir(self.plugins[name]):
 				self.plugins[name].ondestroy()
 			notice("%s Unloaded" % name)
 		except:
-			error("Cannot unload plugin   "+name)
-			error("Use forceunload to remove it anyway")
+			Log.Error("Cannot unload plugin   "+name)
+			Log.Error("Use forceunload to remove it anyway")
 			Log.Error( traceback.print_exc() )
 		try:
 			code = reload(sys.modules[name])
 		except:
-			error("Cannot reload plugin %s!" % name)
+			Log.Error("Cannot reload plugin %s!" % name)
 			return
 		notice("Killing any threads spawned by the plugin...")
 		for tid in self.pluginthreads[name]:
@@ -105,7 +104,7 @@ class plghandler:
 			if "onload" in dir(self.plugins[name]):
 				self.plugins[name].onload(self.app.tasclient)
 		except:
-			error("Cannot load plugin   "+name)
+			Log.Error("Cannot load plugin   "+name)
 			Log.Error( traceback.print_exc() )
 			return
 		loaded("Plugin " + name)
@@ -118,7 +117,7 @@ class plghandler:
 			except SystemExit:
 				raise SystemExit(0)
 			except:
-				error("PLUGIN ERROR")
+				Log.Error("PLUGIN ERROR")
 				Log.Error( traceback.print_exc() )
 
 	def ondisconnected(self):
@@ -129,7 +128,7 @@ class plghandler:
 			except SystemExit:
 				raise SystemExit(0)
 			except:
-				error("PLUGIN ERROR")
+				Log.Error("PLUGIN ERROR")
 				Log.Error( traceback.print_exc() )
 
 	def onmotd(self,content):
@@ -140,7 +139,7 @@ class plghandler:
 			except SystemExit:
 				raise SystemExit(0)
 			except:
-				error("PLUGIN ERROR")
+				Log.Error("PLUGIN ERROR")
 				Log.Error( traceback.print_exc() )
 
 	def onsaid(self,channel,user,message):
@@ -151,7 +150,7 @@ class plghandler:
 			except SystemExit:
 				raise SystemExit(0)
 			except:
-				error("PLUGIN ERROR")
+				Log.Error("PLUGIN ERROR")
 				Log.Error( traceback.print_exc() )
 
 	def onsaidex(self,channel,user,message):
@@ -162,7 +161,7 @@ class plghandler:
 			except SystemExit:
 				raise SystemExit(0)
 			except:
-				error("PLUGIN ERROR")
+				Log.Error("PLUGIN ERROR")
 				Log.Error( traceback.print_exc() )
 
 	def onsaidprivate(self,user,message):
@@ -197,7 +196,7 @@ class plghandler:
 			except SystemExit:
 				raise SystemExit(0)
 			except:
-				error("PLUGIN ERROR")
+				Log.Error("PLUGIN ERROR")
 				Log.Error( traceback.print_exc() )
 
 	def onloggedin(self,socket):
@@ -211,7 +210,7 @@ class plghandler:
 			except SystemExit:
 				raise SystemExit(0)
 			except:
-				error("PLUGIN ERROR")
+				Log.Error("PLUGIN ERROR")
 				Log.Error( traceback.print_exc() )
 
 	def onpong(self):
@@ -222,7 +221,7 @@ class plghandler:
 			except SystemExit:
 				raise SystemExit(0)
 			except:
-				error("PLUGIN ERROR")
+				Log.Error("PLUGIN ERROR")
 				Log.Error( traceback.print_exc() )
 
 	def oncommandfromserver(self,command,args,socket):
@@ -235,7 +234,7 @@ class plghandler:
 			except SystemExit:
 				raise SystemExit(0)	
 			except:
-				error("PLUGIN ERROR")
+				Log.Error("PLUGIN ERROR")
 				Log.Error( traceback.print_exc() )
 
 	def onexit(self):
@@ -246,7 +245,7 @@ class plghandler:
 			except SystemExit:
 				raise SystemExit(0)
 			except:
-				error("PLUGIN ERROR")
+				Log.Error("PLUGIN ERROR")
 				Log.Error( traceback.print_exc() )
 
 	def ondisconnected(self):
@@ -257,6 +256,6 @@ class plghandler:
 			except SystemExit:
 				raise SystemExit(0)
 			except:
-				error("PLUGIN ERROR")
+				Log.Error("PLUGIN ERROR")
 				Log.Error( traceback.print_exc() )
 

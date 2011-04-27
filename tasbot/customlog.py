@@ -67,9 +67,6 @@ def reloaded(t, log=Log):
 def notice(t, log=Log):
 	log.Info( t )
 
-def error(t, log=Log):
-	log.Error( t )
-
 def good(t, log=Log):
 	log.Info( t, "GOOD" )
 

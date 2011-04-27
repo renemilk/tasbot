@@ -143,7 +143,7 @@ def receive(cl,socket,events): #return commandname & args
 		args = cmd.split(" ")[1:]
 		parsecommand(cl,c,args,events,socket)
 	return 0
-class serverevents:
+class ServerEvents:
 	def onconnected(self):
 		good("Connected to TASServer")
 	def onconnectedplugin(self):
@@ -168,15 +168,15 @@ class serverevents:
 		pass
 	def onexit(self):
 	  pass
-class flags:
+class Flags:
 	norecwait = False
 	register = False
 
 
-class tasclient:
+class Tasclient:
 	sock = 0
-	fl = flags()
-	er = 0
+	flags = Flags()
+	error = 0
 	lp = 0.0
 	lpo = 0.0
 	users = dict()
@@ -192,11 +192,11 @@ class tasclient:
 				if result == 1:
 					self.events.ondisconnected()
 					self.users = dict()
-					error("SERVER: Timed out, reconnecting in 40 secs")
+					Log.Error("SERVER: Timed out, reconnecting in 40 secs")
 					self.main.connected = False
-					if not self.fl.norecwait:
+					if not self.flags.norecwait:
 						time.sleep(40.0)
-						self.fl.norecwait = False
+						self.flags.norecwait = False
 					try:
 						self.sock.close()
 					except:
@@ -213,7 +213,7 @@ class tasclient:
 				error("Command Error")
 				Log.Error( traceback.print_exc(file=sys.stdout) )
 	def __init__(self,app):
-		self.events = serverevents()
+		self.events = ServerEvents()
 		self.main = app
 		self.channels = []
 	def connect(self,server,port):

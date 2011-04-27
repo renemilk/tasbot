@@ -99,6 +99,7 @@ def parsecommand(cl,c,args,events,sock):
 					#notice(args[0]+":"+"-1")
 				else:
 					error("Invalid ADDUSER Command from server: %s %s"%(c,str(args)))
+				Log.Debug('ADDUSER %d args: '%len(cl.users) + ' '.join( args ) )
 			except:
 				error("Invalid ADDUSER Command from server: %s %s"%(c,str(args)))
 				Log.Error( traceback.format_exc() )

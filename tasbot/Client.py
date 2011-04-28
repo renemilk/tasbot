@@ -259,7 +259,7 @@ class Tasclient(object):
 						#Log.notice(args[0]+":"+"-1")
 					else:
 						Log.Error("Invalid ADDUSER Command from server: %s %s"%(command,str(args)))
-					Log.Debug('ADDUSER #%d args: '%len(self.users) + ' '.join( args ) )
+					#Log.Debug('ADDUSER #%d args: '%len(self.users) + ' '.join( args ) )
 				except Exception,e:
 					Log.Error("Invalid ADDUSER Command from server: %s %s"%(command,str(args)))
 					Log.Except( e )

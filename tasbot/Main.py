@@ -6,7 +6,7 @@ from daemon import Daemon
 
 class MainApp(Daemon):
 	def PingLoop(self):
-		while self.er == 0:
+		while not self.force_quit and self.er == 0:
 			self.tasclient.ping()
 			time.sleep(10)
 		raise SystemExit(0)

@@ -55,6 +55,7 @@ class Flags:
 
 
 class Tasclient(object):
+	"""the main interaction with server class"""
 	def mainloop(self):
 		while not self.main.force_quit:
 			if self.error == 1:

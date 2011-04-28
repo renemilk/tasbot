@@ -3,6 +3,7 @@
 import sys,datetime,logging
 import logging.handlers
 import os.path
+from color_formatter import *
 
 loggingLevelMapping = {
 			'debug'    : logging.DEBUG,
@@ -60,6 +61,7 @@ class CLog(ILogger):
 	def __init__(self):
 		ILogger.__init__(self,None)
 		self.initialised = False
+		self.FORMAT = '$BOLD%(levelname)s$RESET - %(asctime)s - %(message)s'
 		
 	def Init(self, logfile_name, level='info', stdout_log=True ):
 		logfile_name = os.path.expandvars( logfile_name )
@@ -68,9 +70,10 @@ class CLog(ILogger):
 			self.streamhandler =  logging.StreamHandler(sys.stderr)
 		else:
 			self.streamhandler =  logging.handlers.NullHandler()
-		self.formatter = logging.Formatter('%(levelname)s - %(asctime)s - %(message)s')
-		self.streamhandler.setFormatter( self.formatter )
-		self.filehandler.setFormatter( self.formatter )
+		self.streamformatter = ColoredFormatter(formatter_message(self.FORMAT, True))
+		self.fileformatter = ColoredFormatter(formatter_message(self.FORMAT, False))
+		self.streamhandler.setFormatter( self.streamformatter )
+		self.filehandler.setFormatter( self.fileformatter )
 		self.logger = logging.getLogger('main')
 		self.logger.addHandler(self.streamhandler)
 		self.logger.addHandler(self.filehandler)

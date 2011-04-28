@@ -17,12 +17,12 @@ def _async_raise(tid, exctype):
         # and you should call it again with exc=NULL to revert the effect"""
         ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, 0)
         
-class plghandler:
-	plugins = dict()
-	pluginthreads = dict()
-	app = ""
+class PluginHandler(object):
 	def __init__(self,main):
 		self.app = main
+		self.plugins = dict()
+		self.pluginthreads = dict()
+
 	def addplugin(self,name,tasc):
 		if name in self.plugins:
 			Log.bad("Plugin %s is already loaded" % name)

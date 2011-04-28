@@ -48,6 +48,7 @@ class ServerEvents:
 		pass
 	def onexit(self):
 	  pass
+
 class Flags:
 	norecwait = False
 	register = False

@@ -76,7 +76,7 @@ class MainApp(Daemon):
 		self.er = 0
 		self.connected = False
 		self.cwd = os.getcwd()
-		self.ph = Plugin.plghandler(self)
+		self.ph = Plugin.PluginHandler(self)
 		self.configfile = configfile
 		self.config = ParseConfig.readconfigfile(configfile)
 		self.admins = ParseConfig.parselist(self.config["admins"],",")
@@ -94,7 +94,6 @@ class MainApp(Daemon):
 		
 
 	def run(self):
-
 		while not self.force_quit:
 			try:
 				Log.notice("Connecting to %s:%i" % (self.config["serveraddr"],int(self.config["serverport"])))
@@ -102,12 +101,13 @@ class MainApp(Daemon):
 				while not self.force_quit:
 					time.sleep(10)
 			except SystemExit:
-				return
+				break
 			except KeyboardInterrupt:
 				Log.Error("SIGINT, Exiting")
 				self.ph.onexit()
-				return
+				break
 			except Exception, e:
 				Log.Error("parsing command line")
 				Log.Except( e )
 			time.sleep(10)
+		self.tasclient.disconnect()

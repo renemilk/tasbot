@@ -17,6 +17,12 @@ def _async_raise(tid, exctype):
         # and you should call it again with exc=NULL to revert the effect"""
         ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, 0)
         
+class IPlugin(object):
+	def __init__(self,name,tasclient):
+		self.tasclient = tasclient
+		self.name = name
+		self.logger = Log.getPluginLogger( name )
+	
 class PluginHandler(object):
 	def __init__(self,main):
 		self.app = main
@@ -33,8 +39,11 @@ class PluginHandler(object):
 			Log.Error("Cannot load plugin   "+name)
 			Log.Except( imp )
 			return
-		
-		self.plugins.update([(name,code.Main())])
+		try:
+			self.plugins.update([(name,code.Main(name,tasc))])
+		except TypeError, t:
+			self.plugins.update([(name,code.Main())])
+			Log.Error( 'loaded old-style plugin %s. Please derive from IPlugin'%name)
 		self.pluginthreads.update([(name,[])])
 		
 		self.plugins[name].threads = self.pluginthreads[name]
@@ -115,60 +124,32 @@ class PluginHandler(object):
 			return
 		Log.loaded("Plugin " + name)
 
+	def forall(self,func_name,*args):
+		Log.Info( 'forall %s'%func_name)
+		for name,plugin in filter(lambda (name,plugin): func_name in dir(plugin), self.plugins.iteritems() ):
+			try:
+				func = getattr(plugin,func_name)
+				func( *args )
+			except SystemExit:
+				raise SystemExit(0)
+			except Exception,e :
+				Log.Error("PLUGIN %s ERROR calling  %s"%(func_name,name))
+				Log.Except( e )
+				
 	def onconnected(self):
-		for plugin in self.plugins:
-			try:
-				if "onconnected" in dir(self.plugins[plugin]):
-					self.plugins[plugin].onconnected()
-			except SystemExit:
-				raise SystemExit(0)
-			except:
-				Log.Error("PLUGIN ERROR")
-				Log.Error( traceback.print_exc() )
-
+		self.forall( "onconnected" )
+			
 	def ondisconnected(self):
-		for plugin in self.plugins:
-			try:
-				if "ondisconnected" in dir(self.plugins[plugin]):
-					self.plugins[plugin].ondisconnected()
-			except SystemExit:
-				raise SystemExit(0)
-			except:
-				Log.Error("PLUGIN ERROR")
-				Log.Error( traceback.print_exc() )
-
+		self.forall( "ondisconnected")
+		
 	def onmotd(self,content):
-		for plugin in self.plugins:
-			try:
-				if "onmotd" in dir(self.plugins[plugin]):
-					self.plugins[plugin].onmotd(content)
-			except SystemExit:
-				raise SystemExit(0)
-			except:
-				Log.Error("PLUGIN ERROR")
-				Log.Error( traceback.print_exc() )
+		self.forall( "onmotd", content)
 
 	def onsaid(self,channel,user,message):
-		for plugin in self.plugins:
-			try:
-				if "onsaid" in dir(self.plugins[plugin]):
-					self.plugins[plugin].onsaid(channel,user,message)
-			except SystemExit:
-				raise SystemExit(0)
-			except:
-				Log.Error("PLUGIN ERROR")
-				Log.Error( traceback.print_exc() )
+		self.forall( "onsaid",channel,user,message)
 
 	def onsaidex(self,channel,user,message):
-		for plugin in self.plugins:
-			try:
-				if "onsaidex" in dir(self.plugins[plugin]):
-					self.plugins[plugin].onsaidex(channel,user,message)
-			except SystemExit:
-				raise SystemExit(0)
-			except:
-				Log.Error("PLUGIN ERROR")
-				Log.Error( traceback.print_exc() )
+		self.forall( "onsaidex",channel,user,message)
 
 	def onsaidprivate(self,user,message):
 		args = message.split(" ")
@@ -195,70 +176,19 @@ class PluginHandler(object):
 				Log.bad("Unloadplugin failed")
 				Log.Error( traceback.print_exc() )
 
-		for plugin in self.plugins:
-			try:
-				if "onsaidprivate" in dir(self.plugins[plugin]):
-					self.plugins[plugin].onsaidprivate(user,message)
-			except SystemExit:
-				raise SystemExit(0)
-			except:
-				Log.Error("PLUGIN ERROR")
-				Log.Error( traceback.print_exc() )
+		self.forall( "onsaidprivate",user,message)
 
 	def onloggedin(self,socket):
-		for plugin in self.plugins:
-			try:
-				if "onloggedin" in dir(self.plugins[plugin]):
-					self.plugins[plugin].onloggedin(socket)
-			except SystemExit:
-				raise SystemExit(0)
-			except:
-				Log.Error("PLUGIN ERROR")
-				Log.Error( traceback.print_exc() )
+		self.forall( "onloggedin",socket)
 
 	def onpong(self):
-		for plugin in self.plugins:
-			try:
-				if "onpong" in dir(self.plugins[plugin]):
-					self.plugins[plugin].onpong()
-			except SystemExit:
-				raise SystemExit(0)
-			except:
-				Log.Error("PLUGIN ERROR")
-				Log.Error( traceback.print_exc() )
-
+		self.forall( "onpong" )
+		
 	def oncommandfromserver(self,command,args,socket):
-		for plugin in self.plugins:
-			try:
-				if "oncommandfromserver" in dir(self.plugins[plugin]):
-					
-					self.plugins[plugin].oncommandfromserver(command,args,socket)
-					
-			except SystemExit:
-				raise SystemExit(0)	
-			except:
-				Log.Error("PLUGIN ERROR")
-				Log.Error( traceback.print_exc() )
+		self.forall( "oncommandfromserver",command,args,socket)
 
 	def onexit(self):
-		for plugin in self.plugins:
-			try:
-				if "onexit" in dir(self.plugins[plugin]):
-					self.plugins[plugin].onexit()
-			except SystemExit:
-				raise SystemExit(0)
-			except:
-				Log.Error("PLUGIN ERROR")
-				Log.Error( traceback.print_exc() )
-
+		self.forall( "onexit" )
+		
 	def ondisconnected(self):
-		for plugin in self.plugins:
-			try:
-				if "ondisconnected" in dir(self.plugins[plugin]):
-					self.plugins[plugin].ondisconnected()
-			except SystemExit:
-				raise SystemExit(0)
-			except:
-				Log.Error("PLUGIN ERROR")
-				Log.Error( traceback.print_exc() )
-
+		self.forall( "ondisconnected" )

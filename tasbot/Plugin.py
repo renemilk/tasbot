@@ -39,8 +39,11 @@ class PluginHandler(object):
 			Log.Error("Cannot load plugin   "+name)
 			Log.Except( imp )
 			return
-		
-		self.plugins.update([(name,code.Main(name,tasc))])
+		try:
+			self.plugins.update([(name,code.Main(name,tasc))])
+		except TypeError, t:
+			self.plugins.update([(name,code.Main())])
+			Log.Error( 'loaded old-style plugin %s. Please derive from IPlugin'%name)
 		self.pluginthreads.update([(name,[])])
 		
 		self.plugins[name].threads = self.pluginthreads[name]

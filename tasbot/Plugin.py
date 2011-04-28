@@ -38,14 +38,14 @@ class plghandler:
 		self.pluginthreads.update([(name,[])])
 		
 		self.plugins[name].threads = self.pluginthreads[name]
-		self.plugins[name].sock = tasc.sock
+		self.plugins[name].socket = tasc.socket
 		#print "Pluging %s has %s functions" % (name,str(dir(self.plugins[name])))
 		
 		try:
 			if "onload" in dir(self.plugins[name]):
 				self.plugins[name].onload(tasc)
 			if "onloggedin" in dir(self.plugins[name]) and self.app.connected:
-				self.plugins[name].onloggedin(tasc.sock)
+				self.plugins[name].onloggedin(tasc.socket)
 		except Exception, e:
 			Log.Except( e )
 			return
@@ -97,7 +97,7 @@ class plghandler:
 		self.plugins.update([(name,code.Main())])
 		self.pluginthreads.update([(name,[])])
 		self.plugins[name].threads = self.pluginthreads[name]
-		self.plugins[name].sock = self.app.tasclient.sock
+		self.plugins[name].socket = self.app.tasclient.socket
 		#print "Pluging %s has %s functions" % (name,str(dir(self.plugins[name])))
 		
 		try:

@@ -27,7 +27,7 @@ class MainApp(Daemon):
 		self.tasclient.events.ondisconnected = self.ph.ondisconnected
 
 		self.ph.onloggedin(socket)
-		self.ph.oncommandfromserver("ACCEPTED",[],self.tasclient.sock)
+		self.ph.oncommandfromserver("ACCEPTED",[],self.tasclient.socket)
 		self.connected = True
 		Log.good("Logged in")
 
@@ -81,6 +81,7 @@ class MainApp(Daemon):
 		self.config = ParseConfig.readconfigfile(configfile)
 		self.admins = ParseConfig.parselist(self.config["admins"],",")
 		self.verbose = verbose
+		self.reg = register
 		self.tasclient = Client.Tasclient(self)
 
 		for p in ParseConfig.parselist(self.config["plugins"],","):
@@ -89,9 +90,10 @@ class MainApp(Daemon):
 		self.tasclient.events.onconnectedplugin = self.ph.onconnected
 		self.tasclient.events.onconnected = self.Dologin
 		self.tasclient.events.onloggedin = self.onlogin
-		self.reg = register
+		
 
 	def run(self):
+
 		while 1:
 			try:
 				Log.notice("Connecting to %s:%i" % (self.config["serveraddr"],int(self.config["serverport"])))

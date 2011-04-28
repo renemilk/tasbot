@@ -5,6 +5,8 @@ import traceback
 import inspect
 import ctypes
 import plugins
+import threading
+
 def _async_raise(tid, exctype):
     '''Raises an exception in the threads with id tid'''
     if not inspect.isclass(exctype):
@@ -16,12 +18,40 @@ def _async_raise(tid, exctype):
         # """if it returns a number greater than one, you're in trouble, 
         # and you should call it again with exc=NULL to revert the effect"""
         ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, 0)
-        
+    
+class PluginThread(threading.Thread):
+	def __init__(self, func, *args ):
+		self.func = func
+		self.args = args
+		threading.Thread.__init__(self)
+		
+	def run(self):
+		self.func( *self.args )
+		
 class IPlugin(object):
 	def __init__(self,name,tasclient):
 		self.tasclient = tasclient
 		self.name = name
 		self.logger = Log.getPluginLogger( name )
+		self.dying = False
+		self.threads = []
+		
+	def ondestroy(self):
+		self.dying = True
+		try:
+			for thread in self.threads:
+				try:
+					thread.join(5)
+				except AttributeError:
+					_async_raise( thread, SystemExit )
+		except Exception, e:
+			Log.Critical( "detroying %s plugin failed"%self.name)
+			Log.Except( e )
+			
+	def startThread(self,func,*args):
+		self.threads.append( PluginThread(func, *args) )
+		self.threads[-1].start()
+		
 	
 class PluginHandler(object):
 	def __init__(self,main):
@@ -44,11 +74,7 @@ class PluginHandler(object):
 		except TypeError, t:
 			self.plugins.update([(name,code.Main())])
 			Log.Error( 'loaded old-style plugin %s. Please derive from IPlugin'%name)
-		self.pluginthreads.update([(name,[])])
-		
-		self.plugins[name].threads = self.pluginthreads[name]
 		self.plugins[name].socket = tasc.socket
-		#print "Pluging %s has %s functions" % (name,str(dir(self.plugins[name])))
 		
 		try:
 			if "onload" in dir(self.plugins[name]):
@@ -66,16 +92,13 @@ class PluginHandler(object):
 		try:
 			if "ondestroy" in dir(self.plugins[name]):
 				self.plugins[name].ondestroy()
-			Log.notice("Killing any threads spawned by the plugin...")
-			for tid in self.pluginthreads[name]:
-				_async_raise(tid,SystemExit)
-			self.pluginthreads.pop(name)
+			Log.Info("Killing any threads spawned by plugin %s:"%name)
 			self.plugins.pop(name)
 			Log.notice("%s Unloaded" % name)
-		except:
+		except Exception, e:
 			Log.Error("Cannot unload plugin   "+name)
 			Log.Error("Use forceunload to remove it anyway")
-			Log.Error( traceback.print_exc() )
+			Log.Except( e )
 			
 	def unloadAll(self):
 		#make copy because unload changes the dict
@@ -106,14 +129,8 @@ class PluginHandler(object):
 		except:
 			Log.Error("Cannot reload plugin %s!" % name)
 			return
-		Log.notice("Killing any threads spawned by the plugin...")
-		for tid in self.pluginthreads[name]:
-			_async_raise(tid,SystemExit)
 		self.plugins.update([(name,code.Main())])
-		self.pluginthreads.update([(name,[])])
-		self.plugins[name].threads = self.pluginthreads[name]
 		self.plugins[name].socket = self.app.tasclient.socket
-		#print "Pluging %s has %s functions" % (name,str(dir(self.plugins[name])))
 		
 		try:
 			if "onload" in dir(self.plugins[name]):

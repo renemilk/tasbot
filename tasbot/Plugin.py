@@ -17,6 +17,12 @@ def _async_raise(tid, exctype):
         # and you should call it again with exc=NULL to revert the effect"""
         ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, 0)
         
+class IPlugin(object):
+	def __init__(self,name,tasclient):
+		self.tasclient = tasclient
+		self.name = name
+		self.logger = Log.getPluginLogger( name )
+	
 class PluginHandler(object):
 	def __init__(self,main):
 		self.app = main
@@ -34,7 +40,7 @@ class PluginHandler(object):
 			Log.Except( imp )
 			return
 		
-		self.plugins.update([(name,code.Main())])
+		self.plugins.update([(name,code.Main(name,tasc))])
 		self.pluginthreads.update([(name,[])])
 		
 		self.plugins[name].threads = self.pluginthreads[name]

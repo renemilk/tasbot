@@ -90,15 +90,16 @@ class MainApp(Daemon):
 		self.tasclient.events.onconnectedplugin = self.ph.onconnected
 		self.tasclient.events.onconnected = self.Dologin
 		self.tasclient.events.onloggedin = self.onlogin
+		self.force_quit = False
 		
 
 	def run(self):
 
-		while 1:
+		while not self.force_quit:
 			try:
 				Log.notice("Connecting to %s:%i" % (self.config["serveraddr"],int(self.config["serverport"])))
 				self.tasclient.connect(self.config["serveraddr"],int(self.config["serverport"]))
-				while 1:
+				while not self.force_quit:
 					time.sleep(10)
 			except SystemExit:
 				return

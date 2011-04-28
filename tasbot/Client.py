@@ -56,7 +56,7 @@ class Flags:
 
 class Tasclient(object):
 	def mainloop(self):
-		while 1:
+		while not self.main.force_quit:
 			if self.error == 1:
 				raise SystemExit(0)
 			try:
@@ -83,7 +83,7 @@ class Tasclient(object):
 				raise SystemExit(0)
 			except Exception, e:
 				Log.Error("Command Error")
-				Log.Error( e )
+				Log.Except( e )
 
 	def __init__(self,app):
 		self.events = ServerEvents()

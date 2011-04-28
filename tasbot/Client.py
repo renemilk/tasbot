@@ -168,6 +168,10 @@ class Tasclient(object):
 	def say(self,channel,phrase):
 		self.join(channel)
 		self.socket.send("SAY %s %s\n" % (channel,phrase) )
+		
+	def sayex(self,channel,phrase):
+		self.join(channel)
+		self.socket.send("SAYEX %s %s\n" % (channel,phrase) )
 
 	def ping(self):
 		if self.error == 1:

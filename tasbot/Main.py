@@ -101,6 +101,7 @@ class MainApp(Daemon):
 				while not self.force_quit:
 					time.sleep(10)
 			except SystemExit:
+				Log.Info( "MainApp got SystemExit" )
 				break
 			except KeyboardInterrupt:
 				Log.Error("SIGINT, Exiting")

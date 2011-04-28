@@ -69,7 +69,9 @@ class PluginHandler(object):
 			Log.Error( traceback.print_exc() )
 			
 	def unloadAll(self):
-		for name in self.plugins:
+		#make copy because unload changes the dict
+		names = [ name for name in self.plugins ]
+		for name in names:
 			self.unloadplugin(name)
 
 	def forceunloadplugin(self,name,tasc):

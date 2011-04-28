@@ -125,7 +125,6 @@ class PluginHandler(object):
 		Log.loaded("Plugin " + name)
 
 	def forall(self,func_name,*args):
-		Log.Info( 'forall %s'%func_name)
 		for name,plugin in filter(lambda (name,plugin): func_name in dir(plugin), self.plugins.iteritems() ):
 			try:
 				func = getattr(plugin,func_name)

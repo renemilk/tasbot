@@ -110,4 +110,7 @@ class MainApp(Daemon):
 				Log.Error("parsing command line")
 				Log.Except( e )
 			time.sleep(10)
+		self.ph.onexit()
+		self.ph.unloadAll()
 		self.tasclient.disconnect()
+		self.tasclient = None

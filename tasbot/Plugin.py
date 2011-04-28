@@ -67,6 +67,10 @@ class PluginHandler(object):
 			Log.Error("Cannot unload plugin   "+name)
 			Log.Error("Use forceunload to remove it anyway")
 			Log.Error( traceback.print_exc() )
+			
+	def unloadAll(self):
+		for name in self.plugins:
+			self.unloadplugin(name)
 
 	def forceunloadplugin(self,name,tasc):
 		if not name in self.plugins:
@@ -200,11 +204,8 @@ class PluginHandler(object):
 				Log.Error( traceback.print_exc() )
 
 	def onloggedin(self,socket):
-		
 		for plugin in self.plugins:
-			
 			try:
-				
 				if "onloggedin" in dir(self.plugins[plugin]):
 					self.plugins[plugin].onloggedin(socket)
 			except SystemExit:

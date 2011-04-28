@@ -14,46 +14,30 @@ loggingLevelMapping = {
 			'fatal'    : logging.FATAL,
 		}
 
-class CLog:
-
-	def __init__(self):
-		self.initialised = False
+class ILogger(object):
+	def __init__(self,prefix=None):
+		self.default_prefix = prefix
 		
-	def Init(self, logfile_name, level='info', stdout_log=True ):
-		logfile_name = os.path.expandvars( logfile_name )
-		filehandler = logging.handlers.RotatingFileHandler(logfile_name, maxBytes=1048576, backupCount=5) # 1MB files
-		if stdout_log:
-			streamhandler =  logging.StreamHandler(sys.stderr)
-		else:
-			streamhandler =  logging.handlers.NullHandler()
-		formatter = logging.Formatter('%(levelname)s - %(asctime)s - %(message)s')
-		streamhandler.setFormatter( formatter )
-		filehandler.setFormatter( formatter )
-		self.logger = logging.getLogger('main')
-		self.logger.addHandler(streamhandler)
-		self.logger.addHandler(filehandler)
-		self.logger.setLevel( loggingLevelMapping[level] )
-		
-		self.initialised = True
-		self.logger.info( 'session started' )
-
-	def _prepare(self,msg,prefix=None):
+	def _prepare(self,msg,prefix):
 		if prefix:
 			msg = '[%s] %s'%(prefix,msg)
+		if self.default_prefix:
+			msg = '<%s> %s'%(self.default_prefix, msg)
 		if not self.initialised:
 			sys.stderr.write( str(msg) + 'Logger not initialised\n' )
 			return 'WARGH! logging is NOT initialised'
 		return msg
 
 	def Error(self, msg,prefix=None):
-		self.logger.error( self._prepare( msg ) )
+		self.logger.error( self._prepare( msg,prefix ) )
 
 	def Debug(self, msg,prefix=None):
-		self.logger.debug( self._prepare( msg ) )
+		self.logger.debug( self._prepare( msg,prefix ) )
 	def Info(self, msg,prefix=None):
-		self.logger.info( self._prepare( msg ) )
+		self.logger.info( self._prepare( msg,prefix ) )
 		
 	def Except(self,e):
+		#TODO needs prefix handling
 		self.logger.exception( e )
 	
 	def loaded(self,t):
@@ -70,6 +54,39 @@ class CLog:
 
 	def bad(self,t):
 		self.Error( t,"BAD" )
+
+class CLog(ILogger):
+
+	def __init__(self):
+		ILogger.__init__(self,None)
+		self.initialised = False
+		
+	def Init(self, logfile_name, level='info', stdout_log=True ):
+		logfile_name = os.path.expandvars( logfile_name )
+		self.filehandler = logging.handlers.RotatingFileHandler(logfile_name, maxBytes=1048576, backupCount=5) # 1MB files
+		if stdout_log:
+			self.streamhandler =  logging.StreamHandler(sys.stderr)
+		else:
+			self.streamhandler =  logging.handlers.NullHandler()
+		self.formatter = logging.Formatter('%(levelname)s - %(asctime)s - %(message)s')
+		self.streamhandler.setFormatter( self.formatter )
+		self.filehandler.setFormatter( self.formatter )
+		self.logger = logging.getLogger('main')
+		self.logger.addHandler(self.streamhandler)
+		self.logger.addHandler(self.filehandler)
+		self.logger.setLevel( loggingLevelMapping[level] )
+		
+		self.initialised = True
+		self.logger.info( 'session started' )
+	
+	def getPluginLogger(self, name):
+		return PrefixedLogger( self, name )
+
+class PrefixedLogger(ILogger):
+	def __init__(self, clog,name):
+		ILogger.__init__(self, 'PL %s'%name)
+		self.logger = clog.logger
+		self.initialised = True
 
 Log = CLog()
 

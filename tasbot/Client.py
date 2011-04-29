@@ -55,6 +55,7 @@ class Flags:
 
 
 class Tasclient(object):
+	"""the main interaction with server class"""
 	def mainloop(self):
 		while not self.main.force_quit:
 			if self.error == 1:
@@ -95,7 +96,7 @@ class Tasclient(object):
 		self.lpo = 0.0
 		self.users = dict()
 		self.socket = None
-		
+
 	def connect(self,server,port):
 		port = int(port)
 		self.lastserver = server
@@ -142,7 +143,7 @@ class Tasclient(object):
 		self.password = password
 		self.channels = []
 		self.receive()
-		
+
 	def register(self,username,password):
 		try:
 			Log.notice("Trying to register account")
@@ -150,7 +151,7 @@ class Tasclient(object):
 		except Exception,e:
 			Log.Error("Cannot send register command")
 			Log.Except( e )
-			
+
 	def leave(self,channel): #Leaves a channel
 		if channel in self.channels:
 			try:
@@ -169,7 +170,7 @@ class Tasclient(object):
 	def say(self,channel,phrase):
 		self.join(channel)
 		self.socket.send("SAY %s %s\n" % (channel,phrase) )
-		
+
 	def sayex(self,channel,phrase):
 		self.join(channel)
 		self.socket.send("SAYEX %s %s\n" % (channel,phrase) )
@@ -217,7 +218,7 @@ class Tasclient(object):
 				Log.Error("Login failed ( %s ), trying to register..." % ' '.join(args))
 				Log.notice("Closing Connection")
 				self.socket.close()
-				self.fl.register = True
+				self.flags.register = True
 				self.connect(self.lastserver,self.lastport)
 
 			if command == "REGISTRATIONACCEPTED":
@@ -300,3 +301,4 @@ class Tasclient(object):
 			args = cmd.split(" ")[1:]
 			self.parsecommand(c,args)
 		return 0
+

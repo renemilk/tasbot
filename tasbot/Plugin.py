@@ -5,8 +5,10 @@ import traceback
 import inspect
 import ctypes
 import plugins
+import threading
+
 def _async_raise(tid, exctype):
-    '''Raises an exception in the threads with id tid'''
+    '''Raises an exception in the threads with id tid (never seen working)'''
     if not inspect.isclass(exctype):
         raise TypeError("Only types can be raised (not instances)")
     res = ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, ctypes.py_object(exctype))
@@ -16,20 +18,62 @@ def _async_raise(tid, exctype):
         # """if it returns a number greater than one, you're in trouble, 
         # and you should call it again with exc=NULL to revert the effect"""
         ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, 0)
-        
+    
+class PluginThread(threading.Thread):
+	"""tiny wrapper to execute function with args in a thread"""
+	def __init__(self, func, *args ):
+		self.func = func
+		self.args = args
+		threading.Thread.__init__(self)
+		
+	def run(self):
+		self.func( *self.args )
+		
 class IPlugin(object):
+	"""base class all plugins should derive from (and expose fitting ctor)"""
 	def __init__(self,name,tasclient):
 		self.tasclient = tasclient
 		self.name = name
 		self.logger = Log.getPluginLogger( name )
+		self.dying = False
+		self.threads = []
+		
+	def ondestroy(self):
+		"""tell myself i'm dying and try to stop all my threads"""
+		self.dying = True
+		
+		try:
+			for thread in self.threads:
+				try:
+					thread.join(5)
+				except AttributeError:
+					#if its an old style id still try to terminate it (will prolly fail tho)
+					_async_raise( thread, SystemExit )
+		except Exception, e:
+			self.logger.Critical( "detroying %s plugin failed"%self.name)
+			self.logger.Except( e )
+		self.threads = filter( lambda thread: isinstance(thread, PluginThread) and thread.isAlive(), self.threads )
+		if len(self.threads):
+			self.logger.Error( "%d threads left alive after destroy was called" )
+			
+	def startThread(self,func,*args):
+		"""run a given function with args in a new thread that is added to an internal list"""
+		self.threads.append( PluginThread(func, *args) )
+		#app exists if only daemon threads are left alive
+		self.threads[-1].daemon = True
+		self.threads[-1].start()
+		
 	
 class PluginHandler(object):
+	""" manage runtime loaded modules (plugins) """
+	
 	def __init__(self,main):
 		self.app = main
 		self.plugins = dict()
 		self.pluginthreads = dict()
 
 	def addplugin(self,name,tasc):
+		"""try to import module name and init it"""
 		if name in self.plugins:
 			Log.bad("Plugin %s is already loaded" % name)
 			return
@@ -44,11 +88,7 @@ class PluginHandler(object):
 		except TypeError, t:
 			self.plugins.update([(name,code.Main())])
 			Log.Error( 'loaded old-style plugin %s. Please derive from IPlugin'%name)
-		self.pluginthreads.update([(name,[])])
-		
-		self.plugins[name].threads = self.pluginthreads[name]
 		self.plugins[name].socket = tasc.socket
-		#print "Pluging %s has %s functions" % (name,str(dir(self.plugins[name])))
 		
 		try:
 			if "onload" in dir(self.plugins[name]):
@@ -59,37 +99,39 @@ class PluginHandler(object):
 			Log.Except( e )
 			return
 		Log.loaded("Plugin " + name)
+		
 	def unloadplugin(self,name):
+		""" unload plugin, stop all its threads via ondestroy and remove from interal list"""
 		if not name in self.plugins:
 			Log.Error("Plugin %s not loaded"%name)
 			return
 		try:
 			if "ondestroy" in dir(self.plugins[name]):
 				self.plugins[name].ondestroy()
-			Log.notice("Killing any threads spawned by the plugin...")
-			for tid in self.pluginthreads[name]:
-				_async_raise(tid,SystemExit)
-			self.pluginthreads.pop(name)
 			self.plugins.pop(name)
 			Log.notice("%s Unloaded" % name)
-		except:
+		except Exception, e:
 			Log.Error("Cannot unload plugin   "+name)
 			Log.Error("Use forceunload to remove it anyway")
-			Log.Error( traceback.print_exc() )
+			Log.Except( e )
 			
 	def unloadAll(self):
+		"""convenience function to unload all plugins at once"""
 		#make copy because unload changes the dict
 		names = [ name for name in self.plugins ]
 		for name in names:
 			self.unloadplugin(name)
 
 	def forceunloadplugin(self,name,tasc):
+		"""simply removes name from internal list, only call if unload else fails"""
 		if not name in self.plugins:
 			Log.Error("Plugin %s not loaded"%name)
 			return
 		self.plugins.pop(name)
 		Log.bad("%s UnLog.loaded(Forced)" % name)
+		
 	def reloadplugin(self,name):
+		"""broken"""
 		if not name in self.plugins:
 			Log.Error("Plugin %s not loaded"%name)
 			return
@@ -106,14 +148,8 @@ class PluginHandler(object):
 		except:
 			Log.Error("Cannot reload plugin %s!" % name)
 			return
-		Log.notice("Killing any threads spawned by the plugin...")
-		for tid in self.pluginthreads[name]:
-			_async_raise(tid,SystemExit)
 		self.plugins.update([(name,code.Main())])
-		self.pluginthreads.update([(name,[])])
-		self.plugins[name].threads = self.pluginthreads[name]
 		self.plugins[name].socket = self.app.tasclient.socket
-		#print "Pluging %s has %s functions" % (name,str(dir(self.plugins[name])))
 		
 		try:
 			if "onload" in dir(self.plugins[name]):
@@ -125,6 +161,7 @@ class PluginHandler(object):
 		Log.loaded("Plugin " + name)
 
 	def forall(self,func_name,*args):
+		""" execute a given function(name) on all plugins that expose it"""
 		for name,plugin in filter(lambda (name,plugin): func_name in dir(plugin), self.plugins.iteritems() ):
 			try:
 				func = getattr(plugin,func_name)
@@ -151,6 +188,7 @@ class PluginHandler(object):
 		self.forall( "onsaidex",channel,user,message)
 
 	def onsaidprivate(self,user,message):
+		"""react on a few given keywords and also pass the call to all plugins"""
 		args = message.split(" ")
 		if args[0].lower() == "!reloadconfig" and user in self.app.admins:
 			self.app.ReloadConfig()

@@ -1,2 +1,7 @@
 *~
+build/
+dist/
+MANIFEST
 *.pyc
+README.html
+README.txt

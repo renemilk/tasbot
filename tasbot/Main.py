@@ -5,12 +5,16 @@ from customlog import *
 from daemon import Daemon
 
 class MainApp(Daemon):
+	"""main application object that has creates tasclient, pluginhandler and PingLoop instances"""
 	def PingLoop(self):
+		"""sned a PING to the server every 10 seconds until either force_quit is true or i got into an error state"""
 		while not self.force_quit and self.er == 0:
 			self.tasclient.ping()
 			time.sleep(10)
 		raise SystemExit(0)
+	
 	def onlogin(self,socket):
+		"""start PingLoop and client mainloop, connect event handlers"""
 		if self.firstconnect == 1:
 			thread.start_new_thread(self.tasclient.mainloop,())
 			thread.start_new_thread(self.PingLoop,())
@@ -32,9 +36,11 @@ class MainApp(Daemon):
 		Log.good("Logged in")
 
 	def SaveConfig(self):
+		"""commit current config dictionary to file"""
 		ParseConfig.writeconfigfile(self.configfile,self.config)
 
 	def isAdmin(self,username):
+		"""return true if either username or the asscoiated id is in self.admins"""
 		if username in self.admins:
 				return True
 		elif username in self.tasclient.users:
@@ -46,6 +52,7 @@ class MainApp(Daemon):
 				return False
 
 	def Dologin(self):
+		"""handle tasserver login"""
 		if self.tasclient.flags.register:
 			Log.notice("Not logging in because a registration is in progress")
 			return
@@ -57,20 +64,24 @@ class MainApp(Daemon):
 		self.tasclient.login(self.config["nick"],phash,"Newbot",2400,self.config["lanip"] if "lanip" in self.config else "*")
 
 	def Register(self,username,password):
+		"""register new account on tasserver"""
 		m = hashlib.md5()
 		m.update(self.config["password"])
 		self.tasclient.register(self.config["nick"],base64.b64encode(binascii.a2b_hex(m.hexdigest())))
 
 	def destroy(self):
+		"""deprecated"""
 		self.tasclient.error = 1
 		self.er = 1
 		raise SystemExit(0)
 
 	def ReloadConfig(self):
+		"""reload config and admins from file"""
 		self.config = ParseConfig.readconfigfile(self.configfile)
 		self.admins = ParseConfig.parselist(self.config["admins"],",")
 
 	def __init__(self,configfile,pidfile,register,verbose):
+		"""default init and plugin loading"""
 		super(MainApp, self).__init__(pidfile)
 		self.firstconnect = 1
 		self.er = 0
@@ -94,6 +105,7 @@ class MainApp(Daemon):
 		
 
 	def run(self):
+		"""the main loop for MainApp, once this exists MainApp will be in unsable state"""
 		while not self.force_quit:
 			try:
 				Log.notice("Connecting to %s:%i" % (self.config["serveraddr"],int(self.config["serverport"])))

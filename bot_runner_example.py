@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import tasbot,sys
-from tasbot.customlog import Log,notice
+from tasbot.customlog import Log
 
 if __name__=="__main__":			
 	configfile = "Main.conf"
@@ -12,7 +12,7 @@ if __name__=="__main__":
 	for arg in sys.argv:
 		if arg.strip() == "-r":
 			r = True
-			notice("Registering account")
+			Log.Info("Registering account")
 	pidfile = config['pidfile']
 	print 'using pidfile %s'%pidfile
 	inst = tasbot.DefaultApp(configfile,pidfile,r,True)

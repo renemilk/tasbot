@@ -13,9 +13,6 @@ Contents:
 
    README.rst
 
-.. automodule:: tasbot
-   :members:
-
 Indices and tables
 ==================
 

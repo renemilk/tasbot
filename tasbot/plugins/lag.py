@@ -1,4 +1,4 @@
-from ParseConfig import *
+from tasbot.ParseConfig import *
 class Main:
 	sock = 0
 	app = 0

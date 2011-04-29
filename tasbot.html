@@ -1,0 +1,816 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tasbot Package &mdash; tasbot 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="tasbot 0.2.0 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">tasbot 0.2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="tasbot-package">
+<h1>tasbot Package<a class="headerlink" href="#tasbot-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><a class="reference internal" href="#module-tasbot" title="tasbot"><tt class="xref py py-mod docutils literal"><span class="pre">tasbot</span></tt></a> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-tasbot"></span></div>
+<div class="section" id="module-tasbot.Client">
+<span id="client-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">Client</span></tt> Module<a class="headerlink" href="#module-tasbot.Client" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tasbot.Client.Flags">
+<em class="property">class </em><tt class="descclassname">tasbot.Client.</tt><tt class="descname">Flags</tt><a class="reference internal" href="_modules/tasbot/Client.html#Flags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.Flags" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="tasbot.Client.Flags.norecwait">
+<tt class="descname">norecwait</tt><em class="property"> = False</em><a class="headerlink" href="#tasbot.Client.Flags.norecwait" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tasbot.Client.Flags.register">
+<tt class="descname">register</tt><em class="property"> = False</em><a class="headerlink" href="#tasbot.Client.Flags.register" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tasbot.Client.ServerEvents">
+<em class="property">class </em><tt class="descclassname">tasbot.Client.</tt><tt class="descname">ServerEvents</tt><a class="reference internal" href="_modules/tasbot/Client.html#ServerEvents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.ServerEvents" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="tasbot.Client.ServerEvents.oncommandfromserver">
+<tt class="descname">oncommandfromserver</tt><big>(</big><em>command</em>, <em>args</em>, <em>socket</em><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#ServerEvents.oncommandfromserver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.ServerEvents.oncommandfromserver" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Client.ServerEvents.onconnected">
+<tt class="descname">onconnected</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#ServerEvents.onconnected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.ServerEvents.onconnected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Client.ServerEvents.onconnectedplugin">
+<tt class="descname">onconnectedplugin</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#ServerEvents.onconnectedplugin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.ServerEvents.onconnectedplugin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Client.ServerEvents.ondisconnected">
+<tt class="descname">ondisconnected</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#ServerEvents.ondisconnected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.ServerEvents.ondisconnected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Client.ServerEvents.onexit">
+<tt class="descname">onexit</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#ServerEvents.onexit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.ServerEvents.onexit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Client.ServerEvents.onloggedin">
+<tt class="descname">onloggedin</tt><big>(</big><em>socket</em><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#ServerEvents.onloggedin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.ServerEvents.onloggedin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Client.ServerEvents.onmotd">
+<tt class="descname">onmotd</tt><big>(</big><em>content</em><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#ServerEvents.onmotd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.ServerEvents.onmotd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Client.ServerEvents.onpong">
+<tt class="descname">onpong</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#ServerEvents.onpong"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.ServerEvents.onpong" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Client.ServerEvents.onsaid">
+<tt class="descname">onsaid</tt><big>(</big><em>channel</em>, <em>user</em>, <em>message</em><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#ServerEvents.onsaid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.ServerEvents.onsaid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Client.ServerEvents.onsaidex">
+<tt class="descname">onsaidex</tt><big>(</big><em>channel</em>, <em>user</em>, <em>message</em><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#ServerEvents.onsaidex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.ServerEvents.onsaidex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Client.ServerEvents.onsaidprivate">
+<tt class="descname">onsaidprivate</tt><big>(</big><em>user</em>, <em>message</em><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#ServerEvents.onsaidprivate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.ServerEvents.onsaidprivate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tasbot.Client.Tasclient">
+<em class="property">class </em><tt class="descclassname">tasbot.Client.</tt><tt class="descname">Tasclient</tt><big>(</big><em>app</em><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#Tasclient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.Tasclient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>the main interaction with server class</p>
+<dl class="method">
+<dt id="tasbot.Client.Tasclient.connect">
+<tt class="descname">connect</tt><big>(</big><em>server</em>, <em>port</em><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#Tasclient.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.Tasclient.connect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Client.Tasclient.disconnect">
+<tt class="descname">disconnect</tt><big>(</big><em>hard=False</em><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#Tasclient.disconnect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.Tasclient.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Client.Tasclient.join">
+<tt class="descname">join</tt><big>(</big><em>channel</em><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#Tasclient.join"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.Tasclient.join" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Client.Tasclient.leave">
+<tt class="descname">leave</tt><big>(</big><em>channel</em><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#Tasclient.leave"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.Tasclient.leave" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Client.Tasclient.login">
+<tt class="descname">login</tt><big>(</big><em>username</em>, <em>password</em>, <em>client</em>, <em>cpu</em>, <em>lanip='*'</em><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#Tasclient.login"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.Tasclient.login" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Client.Tasclient.mainloop">
+<tt class="descname">mainloop</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#Tasclient.mainloop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.Tasclient.mainloop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Client.Tasclient.parsecommand">
+<tt class="descname">parsecommand</tt><big>(</big><em>command</em>, <em>args</em><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#Tasclient.parsecommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.Tasclient.parsecommand" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Client.Tasclient.ping">
+<tt class="descname">ping</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#Tasclient.ping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.Tasclient.ping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Client.Tasclient.receive">
+<tt class="descname">receive</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#Tasclient.receive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.Tasclient.receive" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Client.Tasclient.register">
+<tt class="descname">register</tt><big>(</big><em>username</em>, <em>password</em><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#Tasclient.register"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.Tasclient.register" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Client.Tasclient.say">
+<tt class="descname">say</tt><big>(</big><em>channel</em>, <em>phrase</em><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#Tasclient.say"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.Tasclient.say" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Client.Tasclient.sayex">
+<tt class="descname">sayex</tt><big>(</big><em>channel</em>, <em>phrase</em><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#Tasclient.sayex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.Tasclient.sayex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tasbot.Client.User">
+<em class="property">class </em><tt class="descclassname">tasbot.Client.</tt><tt class="descname">User</tt><big>(</big><em>username</em>, <em>id</em>, <em>country</em>, <em>cpu</em><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#User"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.User" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="tasbot.Client.User.clientstatus">
+<tt class="descname">clientstatus</tt><big>(</big><em>status</em><big>)</big><a class="reference internal" href="_modules/tasbot/Client.html#User.clientstatus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Client.User.clientstatus" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tasbot.Main">
+<span id="main-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">Main</span></tt> Module<a class="headerlink" href="#module-tasbot.Main" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tasbot.Main.MainApp">
+<em class="property">class </em><tt class="descclassname">tasbot.Main.</tt><tt class="descname">MainApp</tt><big>(</big><em>configfile</em>, <em>pidfile</em>, <em>register</em>, <em>verbose</em><big>)</big><a class="reference internal" href="_modules/tasbot/Main.html#MainApp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Main.MainApp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tasbot.daemon.Daemon" title="tasbot.daemon.Daemon"><tt class="xref py py-class docutils literal"><span class="pre">tasbot.daemon.Daemon</span></tt></a></p>
+<p>main application object that has creates tasclient, pluginhandler and PingLoop instances</p>
+<dl class="method">
+<dt id="tasbot.Main.MainApp.Dologin">
+<tt class="descname">Dologin</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/Main.html#MainApp.Dologin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Main.MainApp.Dologin" title="Permalink to this definition">¶</a></dt>
+<dd><p>handle tasserver login</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Main.MainApp.PingLoop">
+<tt class="descname">PingLoop</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/Main.html#MainApp.PingLoop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Main.MainApp.PingLoop" title="Permalink to this definition">¶</a></dt>
+<dd><p>sned a PING to the server every 10 seconds until either force_quit is true or i got into an error state</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Main.MainApp.Register">
+<tt class="descname">Register</tt><big>(</big><em>username</em>, <em>password</em><big>)</big><a class="reference internal" href="_modules/tasbot/Main.html#MainApp.Register"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Main.MainApp.Register" title="Permalink to this definition">¶</a></dt>
+<dd><p>register new account on tasserver</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Main.MainApp.ReloadConfig">
+<tt class="descname">ReloadConfig</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/Main.html#MainApp.ReloadConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Main.MainApp.ReloadConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>reload config and admins from file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Main.MainApp.SaveConfig">
+<tt class="descname">SaveConfig</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/Main.html#MainApp.SaveConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Main.MainApp.SaveConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>commit current config dictionary to file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Main.MainApp.destroy">
+<tt class="descname">destroy</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/Main.html#MainApp.destroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Main.MainApp.destroy" title="Permalink to this definition">¶</a></dt>
+<dd><p>deprecated</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Main.MainApp.isAdmin">
+<tt class="descname">isAdmin</tt><big>(</big><em>username</em><big>)</big><a class="reference internal" href="_modules/tasbot/Main.html#MainApp.isAdmin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Main.MainApp.isAdmin" title="Permalink to this definition">¶</a></dt>
+<dd><p>return true if either username or the asscoiated id is in self.admins</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Main.MainApp.onlogin">
+<tt class="descname">onlogin</tt><big>(</big><em>socket</em><big>)</big><a class="reference internal" href="_modules/tasbot/Main.html#MainApp.onlogin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Main.MainApp.onlogin" title="Permalink to this definition">¶</a></dt>
+<dd><p>start PingLoop and client mainloop, connect event handlers</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Main.MainApp.run">
+<tt class="descname">run</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/Main.html#MainApp.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Main.MainApp.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>the main loop for MainApp, once this exists MainApp will be in unsable state</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tasbot.ParseConfig">
+<span id="parseconfig-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">ParseConfig</span></tt> Module<a class="headerlink" href="#module-tasbot.ParseConfig" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tasbot.ParseConfig.Config">
+<em class="property">class </em><tt class="descclassname">tasbot.ParseConfig.</tt><tt class="descname">Config</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/tasbot/ParseConfig.html#Config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.ParseConfig.Config" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="tasbot.ParseConfig.Config.GetOptionList">
+<tt class="descname">GetOptionList</tt><big>(</big><em>key</em>, <em>seperator='</em>, <em>'</em>, <em>default=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="_modules/tasbot/ParseConfig.html#Config.GetOptionList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.ParseConfig.Config.GetOptionList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.ParseConfig.Config.GetSingleOption">
+<tt class="descname">GetSingleOption</tt><big>(</big><em>key</em>, <em>default</em><big>)</big><a class="reference internal" href="_modules/tasbot/ParseConfig.html#Config.GetSingleOption"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.ParseConfig.Config.GetSingleOption" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.ParseConfig.Config.write">
+<tt class="descname">write</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/tasbot/ParseConfig.html#Config.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.ParseConfig.Config.write" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tasbot.ParseConfig.parselist">
+<tt class="descclassname">tasbot.ParseConfig.</tt><tt class="descname">parselist</tt><big>(</big><em>string</em>, <em>sep</em><big>)</big><a class="reference internal" href="_modules/tasbot/ParseConfig.html#parselist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.ParseConfig.parselist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tasbot.ParseConfig.readconfigfile">
+<tt class="descclassname">tasbot.ParseConfig.</tt><tt class="descname">readconfigfile</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/tasbot/ParseConfig.html#readconfigfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.ParseConfig.readconfigfile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tasbot.ParseConfig.writeconfigfile">
+<tt class="descclassname">tasbot.ParseConfig.</tt><tt class="descname">writeconfigfile</tt><big>(</big><em>filename</em>, <em>entries</em><big>)</big><a class="reference internal" href="_modules/tasbot/ParseConfig.html#writeconfigfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.ParseConfig.writeconfigfile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tasbot.Plugin">
+<span id="plugin-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">Plugin</span></tt> Module<a class="headerlink" href="#module-tasbot.Plugin" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tasbot.Plugin.IPlugin">
+<em class="property">class </em><tt class="descclassname">tasbot.Plugin.</tt><tt class="descname">IPlugin</tt><big>(</big><em>name</em>, <em>tasclient</em><big>)</big><a class="reference internal" href="_modules/tasbot/Plugin.html#IPlugin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Plugin.IPlugin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>base class all plugins should derive from (and expose fitting ctor)</p>
+<dl class="method">
+<dt id="tasbot.Plugin.IPlugin.ondestroy">
+<tt class="descname">ondestroy</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/Plugin.html#IPlugin.ondestroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Plugin.IPlugin.ondestroy" title="Permalink to this definition">¶</a></dt>
+<dd><p>tell myself i&#8217;m dying and try to stop all my threads</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Plugin.IPlugin.startThread">
+<tt class="descname">startThread</tt><big>(</big><em>func</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/tasbot/Plugin.html#IPlugin.startThread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Plugin.IPlugin.startThread" title="Permalink to this definition">¶</a></dt>
+<dd><p>run a given function with args in a new thread that is added to an internal list</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tasbot.Plugin.PluginHandler">
+<em class="property">class </em><tt class="descclassname">tasbot.Plugin.</tt><tt class="descname">PluginHandler</tt><big>(</big><em>main</em><big>)</big><a class="reference internal" href="_modules/tasbot/Plugin.html#PluginHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Plugin.PluginHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>manage runtime loaded modules (plugins)</p>
+<dl class="method">
+<dt id="tasbot.Plugin.PluginHandler.addplugin">
+<tt class="descname">addplugin</tt><big>(</big><em>name</em>, <em>tasc</em><big>)</big><a class="reference internal" href="_modules/tasbot/Plugin.html#PluginHandler.addplugin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Plugin.PluginHandler.addplugin" title="Permalink to this definition">¶</a></dt>
+<dd><p>try to import module name and init it</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Plugin.PluginHandler.forall">
+<tt class="descname">forall</tt><big>(</big><em>func_name</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/tasbot/Plugin.html#PluginHandler.forall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Plugin.PluginHandler.forall" title="Permalink to this definition">¶</a></dt>
+<dd><p>execute a given function(name) on all plugins that expose it</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Plugin.PluginHandler.forceunloadplugin">
+<tt class="descname">forceunloadplugin</tt><big>(</big><em>name</em>, <em>tasc</em><big>)</big><a class="reference internal" href="_modules/tasbot/Plugin.html#PluginHandler.forceunloadplugin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Plugin.PluginHandler.forceunloadplugin" title="Permalink to this definition">¶</a></dt>
+<dd><p>simply removes name from internal list, only call if unload else fails</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Plugin.PluginHandler.oncommandfromserver">
+<tt class="descname">oncommandfromserver</tt><big>(</big><em>command</em>, <em>args</em>, <em>socket</em><big>)</big><a class="reference internal" href="_modules/tasbot/Plugin.html#PluginHandler.oncommandfromserver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Plugin.PluginHandler.oncommandfromserver" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Plugin.PluginHandler.onconnected">
+<tt class="descname">onconnected</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/Plugin.html#PluginHandler.onconnected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Plugin.PluginHandler.onconnected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Plugin.PluginHandler.ondisconnected">
+<tt class="descname">ondisconnected</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/Plugin.html#PluginHandler.ondisconnected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Plugin.PluginHandler.ondisconnected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Plugin.PluginHandler.onexit">
+<tt class="descname">onexit</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/Plugin.html#PluginHandler.onexit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Plugin.PluginHandler.onexit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Plugin.PluginHandler.onloggedin">
+<tt class="descname">onloggedin</tt><big>(</big><em>socket</em><big>)</big><a class="reference internal" href="_modules/tasbot/Plugin.html#PluginHandler.onloggedin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Plugin.PluginHandler.onloggedin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Plugin.PluginHandler.onmotd">
+<tt class="descname">onmotd</tt><big>(</big><em>content</em><big>)</big><a class="reference internal" href="_modules/tasbot/Plugin.html#PluginHandler.onmotd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Plugin.PluginHandler.onmotd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Plugin.PluginHandler.onpong">
+<tt class="descname">onpong</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/Plugin.html#PluginHandler.onpong"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Plugin.PluginHandler.onpong" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Plugin.PluginHandler.onsaid">
+<tt class="descname">onsaid</tt><big>(</big><em>channel</em>, <em>user</em>, <em>message</em><big>)</big><a class="reference internal" href="_modules/tasbot/Plugin.html#PluginHandler.onsaid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Plugin.PluginHandler.onsaid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Plugin.PluginHandler.onsaidex">
+<tt class="descname">onsaidex</tt><big>(</big><em>channel</em>, <em>user</em>, <em>message</em><big>)</big><a class="reference internal" href="_modules/tasbot/Plugin.html#PluginHandler.onsaidex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Plugin.PluginHandler.onsaidex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Plugin.PluginHandler.onsaidprivate">
+<tt class="descname">onsaidprivate</tt><big>(</big><em>user</em>, <em>message</em><big>)</big><a class="reference internal" href="_modules/tasbot/Plugin.html#PluginHandler.onsaidprivate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Plugin.PluginHandler.onsaidprivate" title="Permalink to this definition">¶</a></dt>
+<dd><p>react on a few given keywords and also pass the call to all plugins</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Plugin.PluginHandler.reloadplugin">
+<tt class="descname">reloadplugin</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="_modules/tasbot/Plugin.html#PluginHandler.reloadplugin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Plugin.PluginHandler.reloadplugin" title="Permalink to this definition">¶</a></dt>
+<dd><p>broken</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Plugin.PluginHandler.unloadAll">
+<tt class="descname">unloadAll</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/Plugin.html#PluginHandler.unloadAll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Plugin.PluginHandler.unloadAll" title="Permalink to this definition">¶</a></dt>
+<dd><p>convenience function to unload all plugins at once</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tasbot.Plugin.PluginHandler.unloadplugin">
+<tt class="descname">unloadplugin</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="_modules/tasbot/Plugin.html#PluginHandler.unloadplugin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Plugin.PluginHandler.unloadplugin" title="Permalink to this definition">¶</a></dt>
+<dd><p>unload plugin, stop all its threads via ondestroy and remove from interal list</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tasbot.Plugin.PluginThread">
+<em class="property">class </em><tt class="descclassname">tasbot.Plugin.</tt><tt class="descname">PluginThread</tt><big>(</big><em>func</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/tasbot/Plugin.html#PluginThread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Plugin.PluginThread" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">threading.Thread</span></tt></p>
+<p>tiny wrapper to execute function with args in a thread</p>
+<dl class="method">
+<dt id="tasbot.Plugin.PluginThread.run">
+<tt class="descname">run</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/Plugin.html#PluginThread.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.Plugin.PluginThread.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tasbot.color_formatter">
+<span id="color-formatter-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">color_formatter</span></tt> Module<a class="headerlink" href="#module-tasbot.color_formatter" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tasbot.color_formatter.ColoredFormatter">
+<em class="property">class </em><tt class="descclassname">tasbot.color_formatter.</tt><tt class="descname">ColoredFormatter</tt><big>(</big><em>msg</em>, <em>use_color=True</em><big>)</big><a class="reference internal" href="_modules/tasbot/color_formatter.html#ColoredFormatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.color_formatter.ColoredFormatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">logging.Formatter</span></tt></p>
+<dl class="method">
+<dt id="tasbot.color_formatter.ColoredFormatter.format">
+<tt class="descname">format</tt><big>(</big><em>record</em><big>)</big><a class="reference internal" href="_modules/tasbot/color_formatter.html#ColoredFormatter.format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.color_formatter.ColoredFormatter.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tasbot.color_formatter.formatter_message">
+<tt class="descclassname">tasbot.color_formatter.</tt><tt class="descname">formatter_message</tt><big>(</big><em>message</em>, <em>use_color=True</em><big>)</big><a class="reference internal" href="_modules/tasbot/color_formatter.html#formatter_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.color_formatter.formatter_message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tasbot.customlog">
+<span id="customlog-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">customlog</span></tt> Module<a class="headerlink" href="#module-tasbot.customlog" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tasbot.customlog.CLog">
+<em class="property">class </em><tt class="descclassname">tasbot.customlog.</tt><tt class="descname">CLog</tt><a class="reference internal" href="_modules/tasbot/customlog.html#CLog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.customlog.CLog" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tasbot.customlog.ILogger" title="tasbot.customlog.ILogger"><tt class="xref py py-class docutils literal"><span class="pre">tasbot.customlog.ILogger</span></tt></a></p>
+<dl class="method">
+<dt id="tasbot.customlog.CLog.Init">
+<tt class="descname">Init</tt><big>(</big><em>logfile_name</em>, <em>level='info'</em>, <em>stdout_log=True</em><big>)</big><a class="reference internal" href="_modules/tasbot/customlog.html#CLog.Init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.customlog.CLog.Init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.customlog.CLog.getPluginLogger">
+<tt class="descname">getPluginLogger</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="_modules/tasbot/customlog.html#CLog.getPluginLogger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.customlog.CLog.getPluginLogger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tasbot.customlog.ILogger">
+<em class="property">class </em><tt class="descclassname">tasbot.customlog.</tt><tt class="descname">ILogger</tt><big>(</big><em>prefix=None</em><big>)</big><a class="reference internal" href="_modules/tasbot/customlog.html#ILogger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.customlog.ILogger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="tasbot.customlog.ILogger.Debug">
+<tt class="descname">Debug</tt><big>(</big><em>msg</em>, <em>prefix=None</em><big>)</big><a class="reference internal" href="_modules/tasbot/customlog.html#ILogger.Debug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.customlog.ILogger.Debug" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.customlog.ILogger.Error">
+<tt class="descname">Error</tt><big>(</big><em>msg</em>, <em>prefix=None</em><big>)</big><a class="reference internal" href="_modules/tasbot/customlog.html#ILogger.Error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.customlog.ILogger.Error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.customlog.ILogger.Except">
+<tt class="descname">Except</tt><big>(</big><em>e</em><big>)</big><a class="reference internal" href="_modules/tasbot/customlog.html#ILogger.Except"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.customlog.ILogger.Except" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.customlog.ILogger.Info">
+<tt class="descname">Info</tt><big>(</big><em>msg</em>, <em>prefix=None</em><big>)</big><a class="reference internal" href="_modules/tasbot/customlog.html#ILogger.Info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.customlog.ILogger.Info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.customlog.ILogger.bad">
+<tt class="descname">bad</tt><big>(</big><em>t</em><big>)</big><a class="reference internal" href="_modules/tasbot/customlog.html#ILogger.bad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.customlog.ILogger.bad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.customlog.ILogger.good">
+<tt class="descname">good</tt><big>(</big><em>t</em><big>)</big><a class="reference internal" href="_modules/tasbot/customlog.html#ILogger.good"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.customlog.ILogger.good" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.customlog.ILogger.loaded">
+<tt class="descname">loaded</tt><big>(</big><em>t</em><big>)</big><a class="reference internal" href="_modules/tasbot/customlog.html#ILogger.loaded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.customlog.ILogger.loaded" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.customlog.ILogger.notice">
+<tt class="descname">notice</tt><big>(</big><em>t</em><big>)</big><a class="reference internal" href="_modules/tasbot/customlog.html#ILogger.notice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.customlog.ILogger.notice" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.customlog.ILogger.reloaded">
+<tt class="descname">reloaded</tt><big>(</big><em>t</em><big>)</big><a class="reference internal" href="_modules/tasbot/customlog.html#ILogger.reloaded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.customlog.ILogger.reloaded" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tasbot.customlog.PrefixedLogger">
+<em class="property">class </em><tt class="descclassname">tasbot.customlog.</tt><tt class="descname">PrefixedLogger</tt><big>(</big><em>clog</em>, <em>name</em><big>)</big><a class="reference internal" href="_modules/tasbot/customlog.html#PrefixedLogger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.customlog.PrefixedLogger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tasbot.customlog.ILogger" title="tasbot.customlog.ILogger"><tt class="xref py py-class docutils literal"><span class="pre">tasbot.customlog.ILogger</span></tt></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tasbot.daemon">
+<span id="daemon-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">daemon</span></tt> Module<a class="headerlink" href="#module-tasbot.daemon" title="Permalink to this headline">¶</a></h2>
+<p><strong>*
+Modified generic daemon class
+*</strong></p>
+<dl class="docutils">
+<dt>Author:         <a class="reference external" href="http://www.jejik.com/articles/2007/02/a_simple_unix_linux_daemon_in_python/">http://www.jejik.com/articles/2007/02/a_simple_unix_linux_daemon_in_python/</a></dt>
+<dd>www.boxedice.com</dd>
+</dl>
+<p>License:        <a class="reference external" href="http://creativecommons.org/licenses/by-sa/3.0/">http://creativecommons.org/licenses/by-sa/3.0/</a></p>
+<dl class="docutils">
+<dt>Changes:        23rd Jan 2009 (David Mytton &lt;<a class="reference external" href="mailto:david&#37;&#52;&#48;boxedice&#46;com">david<span>&#64;</span>boxedice<span>&#46;</span>com</a>&gt;)</dt>
+<dd><ul class="first simple">
+<li>Replaced hard coded &#8216;/dev/null in __init__ with os.devnull</li>
+<li>Added OS check to conditionally remove code that doesn&#8217;t work on OS X</li>
+<li>Added output to console on completion</li>
+<li>Tidied up formatting</li>
+</ul>
+<p class="last">11th Mar 2009 (David Mytton &lt;<a class="reference external" href="mailto:david&#37;&#52;&#48;boxedice&#46;com">david<span>&#64;</span>boxedice<span>&#46;</span>com</a>&gt;)
+- Fixed problem with daemon exiting on Python 2.4 (before SystemExit was part of the Exception base)
+13th Aug 2010 (David Mytton &lt;<a class="reference external" href="mailto:david&#37;&#52;&#48;boxedice&#46;com">david<span>&#64;</span>boxedice<span>&#46;</span>com</a>&gt;
+- Fixed unhandled exception if PID file is empty</p>
+</dd>
+</dl>
+<dl class="class">
+<dt id="tasbot.daemon.Daemon">
+<em class="property">class </em><tt class="descclassname">tasbot.daemon.</tt><tt class="descname">Daemon</tt><big>(</big><em>pidfile</em>, <em>stdin='/dev/null'</em>, <em>stdout='/dev/null'</em>, <em>stderr='/dev/null'</em><big>)</big><a class="reference internal" href="_modules/tasbot/daemon.html#Daemon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.daemon.Daemon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>A generic daemon class.</p>
+<p>Usage: subclass the Daemon class and override the run() method</p>
+<dl class="method">
+<dt id="tasbot.daemon.Daemon.daemonize">
+<tt class="descname">daemonize</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/daemon.html#Daemon.daemonize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.daemon.Daemon.daemonize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do the UNIX double-fork magic, see Stevens&#8217; &#8220;Advanced 
+Programming in the UNIX Environment&#8221; for details (ISBN 0201563177)
+<a class="reference external" href="http://www.erlenstar.demon.co.uk/unix/faq_2.html#SEC16">http://www.erlenstar.demon.co.uk/unix/faq_2.html#SEC16</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tasbot.daemon.Daemon.delpid">
+<tt class="descname">delpid</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/daemon.html#Daemon.delpid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.daemon.Daemon.delpid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.daemon.Daemon.restart">
+<tt class="descname">restart</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/daemon.html#Daemon.restart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.daemon.Daemon.restart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restart the daemon</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tasbot.daemon.Daemon.run">
+<tt class="descname">run</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/daemon.html#Daemon.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.daemon.Daemon.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>You should override this method when you subclass Daemon. It will be called after the process has been
+daemonized by start() or restart().</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tasbot.daemon.Daemon.start">
+<tt class="descname">start</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/daemon.html#Daemon.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.daemon.Daemon.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start the daemon</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tasbot.daemon.Daemon.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/daemon.html#Daemon.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.daemon.Daemon.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop the daemon</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tasbot.daemon.check_pid">
+<tt class="descclassname">tasbot.daemon.</tt><tt class="descname">check_pid</tt><big>(</big><em>pid</em><big>)</big><a class="reference internal" href="_modules/tasbot/daemon.html#check_pid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.daemon.check_pid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check For the existence of a unix pid.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tasbot.testplugin">
+<span id="testplugin-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">testplugin</span></tt> Module<a class="headerlink" href="#module-tasbot.testplugin" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tasbot.testplugin.Main">
+<em class="property">class </em><tt class="descclassname">tasbot.testplugin.</tt><tt class="descname">Main</tt><a class="reference internal" href="_modules/tasbot/testplugin.html#Main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.testplugin.Main" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="tasbot.testplugin.Main.oncommandfromserver">
+<tt class="descname">oncommandfromserver</tt><big>(</big><em>command</em>, <em>args</em>, <em>socket</em><big>)</big><a class="reference internal" href="_modules/tasbot/testplugin.html#Main.oncommandfromserver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.testplugin.Main.oncommandfromserver" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.testplugin.Main.onconnected">
+<tt class="descname">onconnected</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/testplugin.html#Main.onconnected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.testplugin.Main.onconnected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.testplugin.Main.ondisconnected">
+<tt class="descname">ondisconnected</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/testplugin.html#Main.ondisconnected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.testplugin.Main.ondisconnected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.testplugin.Main.onexit">
+<tt class="descname">onexit</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/testplugin.html#Main.onexit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.testplugin.Main.onexit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.testplugin.Main.onloggedin">
+<tt class="descname">onloggedin</tt><big>(</big><em>socket</em><big>)</big><a class="reference internal" href="_modules/tasbot/testplugin.html#Main.onloggedin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.testplugin.Main.onloggedin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.testplugin.Main.onmotd">
+<tt class="descname">onmotd</tt><big>(</big><em>content</em><big>)</big><a class="reference internal" href="_modules/tasbot/testplugin.html#Main.onmotd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.testplugin.Main.onmotd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.testplugin.Main.onpong">
+<tt class="descname">onpong</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tasbot/testplugin.html#Main.onpong"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.testplugin.Main.onpong" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.testplugin.Main.onsaid">
+<tt class="descname">onsaid</tt><big>(</big><em>channel</em>, <em>user</em>, <em>message</em><big>)</big><a class="reference internal" href="_modules/tasbot/testplugin.html#Main.onsaid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.testplugin.Main.onsaid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.testplugin.Main.onsaidex">
+<tt class="descname">onsaidex</tt><big>(</big><em>channel</em>, <em>user</em>, <em>message</em><big>)</big><a class="reference internal" href="_modules/tasbot/testplugin.html#Main.onsaidex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.testplugin.Main.onsaidex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tasbot.testplugin.Main.onsaidprivate">
+<tt class="descname">onsaidprivate</tt><big>(</big><em>user</em>, <em>message</em><big>)</big><a class="reference internal" href="_modules/tasbot/testplugin.html#Main.onsaidprivate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.testplugin.Main.onsaidprivate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tasbot.utilities">
+<span id="utilities-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">utilities</span></tt> Module<a class="headerlink" href="#module-tasbot.utilities" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="tasbot.utilities.getally">
+<tt class="descclassname">tasbot.utilities.</tt><tt class="descname">getally</tt><big>(</big><em>status</em><big>)</big><a class="reference internal" href="_modules/tasbot/utilities.html#getally"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.utilities.getally" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tasbot.utilities.getaway">
+<tt class="descclassname">tasbot.utilities.</tt><tt class="descname">getaway</tt><big>(</big><em>status</em><big>)</big><a class="reference internal" href="_modules/tasbot/utilities.html#getaway"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.utilities.getaway" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tasbot.utilities.getbot">
+<tt class="descclassname">tasbot.utilities.</tt><tt class="descname">getbot</tt><big>(</big><em>status</em><big>)</big><a class="reference internal" href="_modules/tasbot/utilities.html#getbot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.utilities.getbot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tasbot.utilities.getcolor">
+<tt class="descclassname">tasbot.utilities.</tt><tt class="descname">getcolor</tt><big>(</big><em>status</em><big>)</big><a class="reference internal" href="_modules/tasbot/utilities.html#getcolor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.utilities.getcolor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tasbot.utilities.gethand">
+<tt class="descclassname">tasbot.utilities.</tt><tt class="descname">gethand</tt><big>(</big><em>status</em><big>)</big><a class="reference internal" href="_modules/tasbot/utilities.html#gethand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.utilities.gethand" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tasbot.utilities.getingame">
+<tt class="descclassname">tasbot.utilities.</tt><tt class="descname">getingame</tt><big>(</big><em>status</em><big>)</big><a class="reference internal" href="_modules/tasbot/utilities.html#getingame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.utilities.getingame" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tasbot.utilities.getmod">
+<tt class="descclassname">tasbot.utilities.</tt><tt class="descname">getmod</tt><big>(</big><em>status</em><big>)</big><a class="reference internal" href="_modules/tasbot/utilities.html#getmod"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.utilities.getmod" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tasbot.utilities.getrank">
+<tt class="descclassname">tasbot.utilities.</tt><tt class="descname">getrank</tt><big>(</big><em>status</em><big>)</big><a class="reference internal" href="_modules/tasbot/utilities.html#getrank"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.utilities.getrank" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tasbot.utilities.getready">
+<tt class="descclassname">tasbot.utilities.</tt><tt class="descname">getready</tt><big>(</big><em>status</em><big>)</big><a class="reference internal" href="_modules/tasbot/utilities.html#getready"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.utilities.getready" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tasbot.utilities.getside">
+<tt class="descclassname">tasbot.utilities.</tt><tt class="descname">getside</tt><big>(</big><em>status</em><big>)</big><a class="reference internal" href="_modules/tasbot/utilities.html#getside"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.utilities.getside" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tasbot.utilities.getspec">
+<tt class="descclassname">tasbot.utilities.</tt><tt class="descname">getspec</tt><big>(</big><em>status</em><big>)</big><a class="reference internal" href="_modules/tasbot/utilities.html#getspec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.utilities.getspec" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tasbot.utilities.getsync">
+<tt class="descclassname">tasbot.utilities.</tt><tt class="descname">getsync</tt><big>(</big><em>status</em><big>)</big><a class="reference internal" href="_modules/tasbot/utilities.html#getsync"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.utilities.getsync" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tasbot.utilities.getteam">
+<tt class="descclassname">tasbot.utilities.</tt><tt class="descname">getteam</tt><big>(</big><em>status</em><big>)</big><a class="reference internal" href="_modules/tasbot/utilities.html#getteam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tasbot.utilities.getteam" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tasbot.plugins.html">plugins Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tasbot.plugins.html#module-tasbot.plugins.join_channels"><tt class="docutils literal"><span class="pre">join_channels</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tasbot.plugins.html#module-tasbot.plugins.lag"><tt class="docutils literal"><span class="pre">lag</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">tasbot Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">tasbot</span></tt> Package</a></li>
+<li><a class="reference internal" href="#module-tasbot.Client"><tt class="docutils literal"><span class="pre">Client</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tasbot.Main"><tt class="docutils literal"><span class="pre">Main</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tasbot.ParseConfig"><tt class="docutils literal"><span class="pre">ParseConfig</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tasbot.Plugin"><tt class="docutils literal"><span class="pre">Plugin</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tasbot.color_formatter"><tt class="docutils literal"><span class="pre">color_formatter</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tasbot.customlog"><tt class="docutils literal"><span class="pre">customlog</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tasbot.daemon"><tt class="docutils literal"><span class="pre">daemon</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tasbot.testplugin"><tt class="docutils literal"><span class="pre">testplugin</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tasbot.utilities"><tt class="docutils literal"><span class="pre">utilities</span></tt> Module</a></li>
+<li><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/tasbot.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">tasbot 0.2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Rene Milk, Andrea Piras, Tiziano.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,325 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tasbot.Plugin &mdash; tasbot 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="tasbot 0.2.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">tasbot 0.2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tasbot.Plugin</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="kn">from</span> <span class="nn">customlog</span> <span class="kn">import</span> <span class="n">Log</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">ctypes</span>
+<span class="kn">import</span> <span class="nn">plugins</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+
+<span class="k">def</span> <span class="nf">_async_raise</span><span class="p">(</span><span class="n">tid</span><span class="p">,</span> <span class="n">exctype</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Raises an exception in the threads with id tid (never seen working)&#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">exctype</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Only types can be raised (not instances)&quot;</span><span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">pythonapi</span><span class="o">.</span><span class="n">PyThreadState_SetAsyncExc</span><span class="p">(</span><span class="n">tid</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">py_object</span><span class="p">(</span><span class="n">exctype</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">res</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">Log</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span><span class="s">&quot;Cannot kill thread </span><span class="si">%i</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">tid</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">res</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c"># &quot;&quot;&quot;if it returns a number greater than one, you&#39;re in trouble, </span>
+        <span class="c"># and you should call it again with exc=NULL to revert the effect&quot;&quot;&quot;</span>
+        <span class="n">ctypes</span><span class="o">.</span><span class="n">pythonapi</span><span class="o">.</span><span class="n">PyThreadState_SetAsyncExc</span><span class="p">(</span><span class="n">tid</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="PluginThread"><a class="viewcode-back" href="../../tasbot.html#tasbot.Plugin.PluginThread">[docs]</a><span class="k">class</span> <span class="nc">PluginThread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;tiny wrapper to execute function with args in a thread&quot;&quot;&quot;</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span> <span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">args</span>
+		<span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+		
+<div class="viewcode-block" id="PluginThread.run"><a class="viewcode-back" href="../../tasbot.html#tasbot.Plugin.PluginThread.run">[docs]</a>	<span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="p">)</span>
+		</div></div>
+<div class="viewcode-block" id="IPlugin"><a class="viewcode-back" href="../../tasbot.html#tasbot.Plugin.IPlugin">[docs]</a><span class="k">class</span> <span class="nc">IPlugin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;base class all plugins should derive from (and expose fitting ctor)&quot;&quot;&quot;</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">tasclient</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">tasclient</span> <span class="o">=</span> <span class="n">tasclient</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">Log</span><span class="o">.</span><span class="n">getPluginLogger</span><span class="p">(</span> <span class="n">name</span> <span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">dying</span> <span class="o">=</span> <span class="bp">False</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">threads</span> <span class="o">=</span> <span class="p">[]</span>
+		
+<div class="viewcode-block" id="IPlugin.ondestroy"><a class="viewcode-back" href="../../tasbot.html#tasbot.Plugin.IPlugin.ondestroy">[docs]</a>	<span class="k">def</span> <span class="nf">ondestroy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;tell myself i&#39;m dying and try to stop all my threads&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">dying</span> <span class="o">=</span> <span class="bp">True</span>
+		
+		<span class="k">try</span><span class="p">:</span>
+			<span class="k">for</span> <span class="n">thread</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">threads</span><span class="p">:</span>
+				<span class="k">try</span><span class="p">:</span>
+					<span class="n">thread</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+				<span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+					<span class="c">#if its an old style id still try to terminate it (will prolly fail tho)</span>
+					<span class="n">_async_raise</span><span class="p">(</span> <span class="n">thread</span><span class="p">,</span> <span class="ne">SystemExit</span> <span class="p">)</span>
+		<span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">Critical</span><span class="p">(</span> <span class="s">&quot;detroying </span><span class="si">%s</span><span class="s"> plugin failed&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">Except</span><span class="p">(</span> <span class="n">e</span> <span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">threads</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">thread</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">thread</span><span class="p">,</span> <span class="n">PluginThread</span><span class="p">)</span> <span class="ow">and</span> <span class="n">thread</span><span class="o">.</span><span class="n">isAlive</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">threads</span> <span class="p">)</span>
+		<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">threads</span><span class="p">):</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span> <span class="s">&quot;</span><span class="si">%d</span><span class="s"> threads left alive after destroy was called&quot;</span> <span class="p">)</span>
+			</div>
+<div class="viewcode-block" id="IPlugin.startThread"><a class="viewcode-back" href="../../tasbot.html#tasbot.Plugin.IPlugin.startThread">[docs]</a>	<span class="k">def</span> <span class="nf">startThread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">func</span><span class="p">,</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;run a given function with args in a new thread that is added to an internal list&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">PluginThread</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="p">)</span>
+		<span class="c">#app exists if only daemon threads are left alive</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">threads</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">daemon</span> <span class="o">=</span> <span class="bp">True</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">threads</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+		
+	</div></div>
+<div class="viewcode-block" id="PluginHandler"><a class="viewcode-back" href="../../tasbot.html#tasbot.Plugin.PluginHandler">[docs]</a><span class="k">class</span> <span class="nc">PluginHandler</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot; manage runtime loaded modules (plugins) &quot;&quot;&quot;</span>
+	
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">main</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">main</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">plugins</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">pluginthreads</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+<div class="viewcode-block" id="PluginHandler.addplugin"><a class="viewcode-back" href="../../tasbot.html#tasbot.Plugin.PluginHandler.addplugin">[docs]</a>	<span class="k">def</span> <span class="nf">addplugin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">tasc</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;try to import module name and init it&quot;&quot;&quot;</span>
+		<span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">:</span>
+			<span class="n">Log</span><span class="o">.</span><span class="n">bad</span><span class="p">(</span><span class="s">&quot;Plugin </span><span class="si">%s</span><span class="s"> is already loaded&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+			<span class="k">return</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="n">code</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+		<span class="k">except</span> <span class="ne">ImportError</span><span class="p">,</span> <span class="n">imp</span><span class="p">:</span>
+			<span class="n">Log</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span><span class="s">&quot;Cannot load plugin   &quot;</span><span class="o">+</span><span class="n">name</span><span class="p">)</span>
+			<span class="n">Log</span><span class="o">.</span><span class="n">Except</span><span class="p">(</span> <span class="n">imp</span> <span class="p">)</span>
+			<span class="k">return</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">update</span><span class="p">([(</span><span class="n">name</span><span class="p">,</span><span class="n">code</span><span class="o">.</span><span class="n">Main</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">tasc</span><span class="p">))])</span>
+		<span class="k">except</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">update</span><span class="p">([(</span><span class="n">name</span><span class="p">,</span><span class="n">code</span><span class="o">.</span><span class="n">Main</span><span class="p">())])</span>
+			<span class="n">Log</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span> <span class="s">&#39;loaded old-style plugin </span><span class="si">%s</span><span class="s">. Please derive from IPlugin&#39;</span><span class="o">%</span><span class="n">name</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">socket</span> <span class="o">=</span> <span class="n">tasc</span><span class="o">.</span><span class="n">socket</span>
+		
+		<span class="k">try</span><span class="p">:</span>
+			<span class="k">if</span> <span class="s">&quot;onload&quot;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">[</span><span class="n">name</span><span class="p">]):</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">onload</span><span class="p">(</span><span class="n">tasc</span><span class="p">)</span>
+			<span class="k">if</span> <span class="s">&quot;onloggedin&quot;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">[</span><span class="n">name</span><span class="p">])</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">connected</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">onloggedin</span><span class="p">(</span><span class="n">tasc</span><span class="o">.</span><span class="n">socket</span><span class="p">)</span>
+		<span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+			<span class="n">Log</span><span class="o">.</span><span class="n">Except</span><span class="p">(</span> <span class="n">e</span> <span class="p">)</span>
+			<span class="k">return</span>
+		<span class="n">Log</span><span class="o">.</span><span class="n">loaded</span><span class="p">(</span><span class="s">&quot;Plugin &quot;</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span>
+		</div>
+<div class="viewcode-block" id="PluginHandler.unloadplugin"><a class="viewcode-back" href="../../tasbot.html#tasbot.Plugin.PluginHandler.unloadplugin">[docs]</a>	<span class="k">def</span> <span class="nf">unloadplugin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; unload plugin, stop all its threads via ondestroy and remove from interal list&quot;&quot;&quot;</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">:</span>
+			<span class="n">Log</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span><span class="s">&quot;Plugin </span><span class="si">%s</span><span class="s"> not loaded&quot;</span><span class="o">%</span><span class="n">name</span><span class="p">)</span>
+			<span class="k">return</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="k">if</span> <span class="s">&quot;ondestroy&quot;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">[</span><span class="n">name</span><span class="p">]):</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">ondestroy</span><span class="p">()</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+			<span class="n">Log</span><span class="o">.</span><span class="n">notice</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s"> Unloaded&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+		<span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+			<span class="n">Log</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span><span class="s">&quot;Cannot unload plugin   &quot;</span><span class="o">+</span><span class="n">name</span><span class="p">)</span>
+			<span class="n">Log</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span><span class="s">&quot;Use forceunload to remove it anyway&quot;</span><span class="p">)</span>
+			<span class="n">Log</span><span class="o">.</span><span class="n">Except</span><span class="p">(</span> <span class="n">e</span> <span class="p">)</span>
+			</div>
+<div class="viewcode-block" id="PluginHandler.unloadAll"><a class="viewcode-back" href="../../tasbot.html#tasbot.Plugin.PluginHandler.unloadAll">[docs]</a>	<span class="k">def</span> <span class="nf">unloadAll</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;convenience function to unload all plugins at once&quot;&quot;&quot;</span>
+		<span class="c">#make copy because unload changes the dict</span>
+		<span class="n">names</span> <span class="o">=</span> <span class="p">[</span> <span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span> <span class="p">]</span>
+		<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">unloadplugin</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PluginHandler.forceunloadplugin"><a class="viewcode-back" href="../../tasbot.html#tasbot.Plugin.PluginHandler.forceunloadplugin">[docs]</a>	<span class="k">def</span> <span class="nf">forceunloadplugin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">tasc</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;simply removes name from internal list, only call if unload else fails&quot;&quot;&quot;</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">:</span>
+			<span class="n">Log</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span><span class="s">&quot;Plugin </span><span class="si">%s</span><span class="s"> not loaded&quot;</span><span class="o">%</span><span class="n">name</span><span class="p">)</span>
+			<span class="k">return</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+		<span class="n">Log</span><span class="o">.</span><span class="n">bad</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s"> UnLog.loaded(Forced)&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+		</div>
+<div class="viewcode-block" id="PluginHandler.reloadplugin"><a class="viewcode-back" href="../../tasbot.html#tasbot.Plugin.PluginHandler.reloadplugin">[docs]</a>	<span class="k">def</span> <span class="nf">reloadplugin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;broken&quot;&quot;&quot;</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">:</span>
+			<span class="n">Log</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span><span class="s">&quot;Plugin </span><span class="si">%s</span><span class="s"> not loaded&quot;</span><span class="o">%</span><span class="n">name</span><span class="p">)</span>
+			<span class="k">return</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="k">if</span> <span class="s">&quot;ondestroy&quot;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">[</span><span class="n">name</span><span class="p">]):</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">ondestroy</span><span class="p">()</span>
+			<span class="n">Log</span><span class="o">.</span><span class="n">notice</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s"> Unloaded&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+		<span class="k">except</span><span class="p">:</span>
+			<span class="n">Log</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span><span class="s">&quot;Cannot unload plugin   &quot;</span><span class="o">+</span><span class="n">name</span><span class="p">)</span>
+			<span class="n">Log</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span><span class="s">&quot;Use forceunload to remove it anyway&quot;</span><span class="p">)</span>
+			<span class="n">Log</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span> <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span> <span class="p">)</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="n">code</span> <span class="o">=</span> <span class="nb">reload</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+		<span class="k">except</span><span class="p">:</span>
+			<span class="n">Log</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span><span class="s">&quot;Cannot reload plugin </span><span class="si">%s</span><span class="s">!&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+			<span class="k">return</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">update</span><span class="p">([(</span><span class="n">name</span><span class="p">,</span><span class="n">code</span><span class="o">.</span><span class="n">Main</span><span class="p">())])</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">socket</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">tasclient</span><span class="o">.</span><span class="n">socket</span>
+		
+		<span class="k">try</span><span class="p">:</span>
+			<span class="k">if</span> <span class="s">&quot;onload&quot;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">[</span><span class="n">name</span><span class="p">]):</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">onload</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">tasclient</span><span class="p">)</span>
+		<span class="k">except</span><span class="p">:</span>
+			<span class="n">Log</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span><span class="s">&quot;Cannot load plugin   &quot;</span><span class="o">+</span><span class="n">name</span><span class="p">)</span>
+			<span class="n">Log</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span> <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span> <span class="p">)</span>
+			<span class="k">return</span>
+		<span class="n">Log</span><span class="o">.</span><span class="n">loaded</span><span class="p">(</span><span class="s">&quot;Plugin &quot;</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PluginHandler.forall"><a class="viewcode-back" href="../../tasbot.html#tasbot.Plugin.PluginHandler.forall">[docs]</a>	<span class="k">def</span> <span class="nf">forall</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">func_name</span><span class="p">,</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; execute a given function(name) on all plugins that expose it&quot;&quot;&quot;</span>
+		<span class="k">for</span> <span class="n">name</span><span class="p">,</span><span class="n">plugin</span> <span class="ow">in</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">plugin</span><span class="p">):</span> <span class="n">func_name</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">plugin</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()</span> <span class="p">):</span>
+			<span class="k">try</span><span class="p">:</span>
+				<span class="n">func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">plugin</span><span class="p">,</span><span class="n">func_name</span><span class="p">)</span>
+				<span class="n">func</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span> <span class="p">)</span>
+			<span class="k">except</span> <span class="ne">SystemExit</span><span class="p">:</span>
+				<span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+			<span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span><span class="n">e</span> <span class="p">:</span>
+				<span class="n">Log</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span><span class="s">&quot;PLUGIN </span><span class="si">%s</span><span class="s"> ERROR calling  </span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">func_name</span><span class="p">,</span><span class="n">name</span><span class="p">))</span>
+				<span class="n">Log</span><span class="o">.</span><span class="n">Except</span><span class="p">(</span> <span class="n">e</span> <span class="p">)</span>
+				</div>
+<div class="viewcode-block" id="PluginHandler.onconnected"><a class="viewcode-back" href="../../tasbot.html#tasbot.Plugin.PluginHandler.onconnected">[docs]</a>	<span class="k">def</span> <span class="nf">onconnected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">forall</span><span class="p">(</span> <span class="s">&quot;onconnected&quot;</span> <span class="p">)</span>
+			</div>
+	<span class="k">def</span> <span class="nf">ondisconnected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">forall</span><span class="p">(</span> <span class="s">&quot;ondisconnected&quot;</span><span class="p">)</span>
+		
+<div class="viewcode-block" id="PluginHandler.onmotd"><a class="viewcode-back" href="../../tasbot.html#tasbot.Plugin.PluginHandler.onmotd">[docs]</a>	<span class="k">def</span> <span class="nf">onmotd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">content</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">forall</span><span class="p">(</span> <span class="s">&quot;onmotd&quot;</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PluginHandler.onsaid"><a class="viewcode-back" href="../../tasbot.html#tasbot.Plugin.PluginHandler.onsaid">[docs]</a>	<span class="k">def</span> <span class="nf">onsaid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">channel</span><span class="p">,</span><span class="n">user</span><span class="p">,</span><span class="n">message</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">forall</span><span class="p">(</span> <span class="s">&quot;onsaid&quot;</span><span class="p">,</span><span class="n">channel</span><span class="p">,</span><span class="n">user</span><span class="p">,</span><span class="n">message</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PluginHandler.onsaidex"><a class="viewcode-back" href="../../tasbot.html#tasbot.Plugin.PluginHandler.onsaidex">[docs]</a>	<span class="k">def</span> <span class="nf">onsaidex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">channel</span><span class="p">,</span><span class="n">user</span><span class="p">,</span><span class="n">message</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">forall</span><span class="p">(</span> <span class="s">&quot;onsaidex&quot;</span><span class="p">,</span><span class="n">channel</span><span class="p">,</span><span class="n">user</span><span class="p">,</span><span class="n">message</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PluginHandler.onsaidprivate"><a class="viewcode-back" href="../../tasbot.html#tasbot.Plugin.PluginHandler.onsaidprivate">[docs]</a>	<span class="k">def</span> <span class="nf">onsaidprivate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">user</span><span class="p">,</span><span class="n">message</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;react on a few given keywords and also pass the call to all plugins&quot;&quot;&quot;</span>
+		<span class="n">args</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;!reloadconfig&quot;</span> <span class="ow">and</span> <span class="n">user</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">admins</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">ReloadConfig</span><span class="p">()</span>
+		<span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;!unloadplugin&quot;</span> <span class="ow">and</span> <span class="n">user</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">admins</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+			<span class="k">try</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">unloadplugin</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+			<span class="k">except</span><span class="p">:</span>
+				<span class="n">Log</span><span class="o">.</span><span class="n">bad</span><span class="p">(</span><span class="s">&quot;Unloadplugin failed&quot;</span><span class="p">)</span>
+				<span class="n">Log</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span> <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span> <span class="p">)</span>
+
+		<span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;!loadplugin&quot;</span> <span class="ow">and</span> <span class="n">user</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">admins</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+			<span class="k">try</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">addplugin</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">tasclient</span><span class="p">)</span>
+			<span class="k">except</span><span class="p">:</span>
+				<span class="n">Log</span><span class="o">.</span><span class="n">bad</span><span class="p">(</span><span class="s">&quot;addplugin failed&quot;</span><span class="p">)</span>
+				<span class="n">Log</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span> <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span> <span class="p">)</span>
+
+		<span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;!reloadplugin&quot;</span> <span class="ow">and</span> <span class="n">user</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">admins</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+			<span class="k">try</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">reloadplugin</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+			<span class="k">except</span><span class="p">:</span>
+				<span class="n">Log</span><span class="o">.</span><span class="n">bad</span><span class="p">(</span><span class="s">&quot;Unloadplugin failed&quot;</span><span class="p">)</span>
+				<span class="n">Log</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span> <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span> <span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">forall</span><span class="p">(</span> <span class="s">&quot;onsaidprivate&quot;</span><span class="p">,</span><span class="n">user</span><span class="p">,</span><span class="n">message</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PluginHandler.onloggedin"><a class="viewcode-back" href="../../tasbot.html#tasbot.Plugin.PluginHandler.onloggedin">[docs]</a>	<span class="k">def</span> <span class="nf">onloggedin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">socket</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">forall</span><span class="p">(</span> <span class="s">&quot;onloggedin&quot;</span><span class="p">,</span><span class="n">socket</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PluginHandler.onpong"><a class="viewcode-back" href="../../tasbot.html#tasbot.Plugin.PluginHandler.onpong">[docs]</a>	<span class="k">def</span> <span class="nf">onpong</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">forall</span><span class="p">(</span> <span class="s">&quot;onpong&quot;</span> <span class="p">)</span>
+		</div>
+<div class="viewcode-block" id="PluginHandler.oncommandfromserver"><a class="viewcode-back" href="../../tasbot.html#tasbot.Plugin.PluginHandler.oncommandfromserver">[docs]</a>	<span class="k">def</span> <span class="nf">oncommandfromserver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">command</span><span class="p">,</span><span class="n">args</span><span class="p">,</span><span class="n">socket</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">forall</span><span class="p">(</span> <span class="s">&quot;oncommandfromserver&quot;</span><span class="p">,</span><span class="n">command</span><span class="p">,</span><span class="n">args</span><span class="p">,</span><span class="n">socket</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PluginHandler.onexit"><a class="viewcode-back" href="../../tasbot.html#tasbot.Plugin.PluginHandler.onexit">[docs]</a>	<span class="k">def</span> <span class="nf">onexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">forall</span><span class="p">(</span> <span class="s">&quot;onexit&quot;</span> <span class="p">)</span>
+		</div>
+<div class="viewcode-block" id="PluginHandler.ondisconnected"><a class="viewcode-back" href="../../tasbot.html#tasbot.Plugin.PluginHandler.ondisconnected">[docs]</a>	<span class="k">def</span> <span class="nf">ondisconnected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">forall</span><span class="p">(</span> <span class="s">&quot;ondisconnected&quot;</span> <span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">tasbot 0.2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Rene Milk, Andrea Piras, Tiziano.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

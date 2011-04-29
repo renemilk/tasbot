@@ -1,0 +1,132 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tasbot.plugins.join_channels &mdash; tasbot 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="tasbot 0.2.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">tasbot 0.2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tasbot.plugins.join_channels</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">tasbot.ParseConfig</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">from</span> <span class="nn">tasbot.utilities</span> <span class="kn">import</span> <span class="o">*</span>
+<div class="viewcode-block" id="Main"><a class="viewcode-back" href="../../../tasbot.plugins.html#tasbot.plugins.join_channels.Main">[docs]</a><span class="k">class</span> <span class="nc">Main</span><span class="p">:</span>
+	<span class="n">joined_channels</span> <span class="o">=</span> <span class="mi">0</span>
+	<span class="n">admins</span> <span class="o">=</span> <span class="p">[]</span>
+	<span class="n">channels</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="Main.onloggedin"><a class="viewcode-back" href="../../../tasbot.plugins.html#tasbot.plugins.join_channels.Main.onloggedin">[docs]</a>	<span class="k">def</span> <span class="nf">onloggedin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">socket</span><span class="p">):</span>
+		<span class="k">for</span> <span class="n">chan</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span> <span class="p">:</span>
+			<span class="n">socket</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">&quot;JOIN </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">chan</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">joined_channels</span> <span class="o">=</span> <span class="mi">1</span>
+</div>
+<div class="viewcode-block" id="Main.oncommandfromserver"><a class="viewcode-back" href="../../../tasbot.plugins.html#tasbot.plugins.join_channels.Main.oncommandfromserver">[docs]</a>	<span class="k">def</span> <span class="nf">oncommandfromserver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">command</span><span class="p">,</span><span class="n">args</span><span class="p">,</span><span class="n">socket</span><span class="p">):</span>
+	    <span class="k">if</span> <span class="n">command</span> <span class="o">==</span> <span class="s">&quot;SAID&quot;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">admins</span><span class="p">:</span>
+		<span class="k">for</span> <span class="n">chan</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="mi">3</span><span class="p">:]:</span>
+			<span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;!faqchan&quot;</span><span class="p">:</span>
+				<span class="n">socket</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">&quot;JOIN </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">chan</span><span class="p">))</span>
+				<span class="k">if</span> <span class="ow">not</span> <span class="n">chan</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">:</span>
+					<span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chan</span><span class="p">)</span>
+					<span class="bp">self</span><span class="o">.</span><span class="n">saveChannels</span><span class="p">()</span>
+			<span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;!faq!chan&quot;</span><span class="p">:</span>
+				<span class="n">socket</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">&quot;LEAVE </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">chan</span><span class="p">))</span>
+				<span class="k">if</span> <span class="n">chan</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">:</span>
+					<span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">chan</span><span class="p">)</span>
+					<span class="bp">self</span><span class="o">.</span><span class="n">saveChannels</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="Main.saveChannels"><a class="viewcode-back" href="../../../tasbot.plugins.html#tasbot.plugins.join_channels.Main.saveChannels">[docs]</a>	<span class="k">def</span> <span class="nf">saveChannels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">savestring</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+		<span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">:</span>
+			<span class="n">savestring</span> <span class="o">+=</span> <span class="n">channel</span> <span class="o">+</span> <span class="s">&quot;,&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s">&quot;channels&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">savestring</span>
+		<span class="n">writeconfigfile</span><span class="p">(</span><span class="s">&quot;Main.conf&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Main.onload"><a class="viewcode-back" href="../../../tasbot.plugins.html#tasbot.plugins.join_channels.Main.onload">[docs]</a>	<span class="k">def</span> <span class="nf">onload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">tasc</span><span class="p">):</span>
+	    <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">tasc</span><span class="o">.</span><span class="n">main</span>
+	    <span class="bp">self</span><span class="o">.</span><span class="n">admins</span> <span class="o">=</span> <span class="n">parselist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s">&quot;admins&quot;</span><span class="p">],</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
+	    <span class="bp">self</span><span class="o">.</span><span class="n">channels</span> <span class="o">=</span> <span class="n">parselist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s">&quot;channels&quot;</span><span class="p">],</span><span class="s">&#39;,&#39;</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">tasbot 0.2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Rene Milk, Andrea Piras, Tiziano.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

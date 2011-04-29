@@ -1,0 +1,126 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tasbot.testplugin &mdash; tasbot 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="tasbot 0.2.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">tasbot 0.2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tasbot.testplugin</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="k">try</span><span class="p">:</span>
+	<span class="kn">from</span> <span class="nn">tasbot.Plugin</span> <span class="kn">import</span> <span class="n">IPlugin</span>
+<span class="k">except</span><span class="p">:</span>
+	<span class="kn">from</span> <span class="nn">Plugin</span> <span class="kn">import</span> <span class="n">IPlugin</span>
+
+<span class="c">#class Main(IPlugin):</span>
+	<span class="c">#def __init__(self,name,tasclient):</span>
+		<span class="c">#IPlugin.__init__(name,tasclient)</span>
+<span class="k">class</span> <span class="nc">Main</span><span class="p">:</span>
+<div class="viewcode-block" id="Main"><a class="viewcode-back" href="../../tasbot.html#tasbot.testplugin.Main">[docs]</a>		
+	<span class="k">def</span> <span class="nf">onconnected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Main.onconnected"><a class="viewcode-back" href="../../tasbot.html#tasbot.testplugin.Main.onconnected">[docs]</a>		<span class="k">print</span> <span class="s">&quot;onconnected()&quot;</span>
+	<span class="k">def</span> <span class="nf">ondisconnected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div>
+<div class="viewcode-block" id="Main.ondisconnected"><a class="viewcode-back" href="../../tasbot.html#tasbot.testplugin.Main.ondisconnected">[docs]</a>		<span class="k">print</span> <span class="s">&quot;ondisconnected()&quot;</span>
+	<span class="k">def</span> <span class="nf">onmotd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">content</span><span class="p">):</span></div>
+<div class="viewcode-block" id="Main.onmotd"><a class="viewcode-back" href="../../tasbot.html#tasbot.testplugin.Main.onmotd">[docs]</a>		<span class="k">print</span> <span class="s">&quot;onmotd(</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">content</span><span class="p">))</span>
+	<span class="k">def</span> <span class="nf">onsaid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">channel</span><span class="p">,</span><span class="n">user</span><span class="p">,</span><span class="n">message</span><span class="p">):</span></div>
+<div class="viewcode-block" id="Main.onsaid"><a class="viewcode-back" href="../../tasbot.html#tasbot.testplugin.Main.onsaid">[docs]</a>		<span class="k">print</span> <span class="s">&quot;onsaid(</span><span class="si">%s</span><span class="s">,</span><span class="si">%s</span><span class="s">,</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">channel</span><span class="p">),</span><span class="nb">str</span><span class="p">(</span><span class="n">user</span><span class="p">),</span><span class="nb">str</span><span class="p">(</span><span class="n">message</span><span class="p">))</span>
+	<span class="k">def</span> <span class="nf">onsaidex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">channel</span><span class="p">,</span><span class="n">user</span><span class="p">,</span><span class="n">message</span><span class="p">):</span></div>
+<div class="viewcode-block" id="Main.onsaidex"><a class="viewcode-back" href="../../tasbot.html#tasbot.testplugin.Main.onsaidex">[docs]</a>		<span class="k">print</span> <span class="s">&quot;onsaidex(</span><span class="si">%s</span><span class="s">,</span><span class="si">%s</span><span class="s">,</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">channel</span><span class="p">),</span><span class="nb">str</span><span class="p">(</span><span class="n">user</span><span class="p">),</span><span class="nb">str</span><span class="p">(</span><span class="n">message</span><span class="p">))</span>
+	<span class="k">def</span> <span class="nf">onsaidprivate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">user</span><span class="p">,</span><span class="n">message</span><span class="p">):</span></div>
+<div class="viewcode-block" id="Main.onsaidprivate"><a class="viewcode-back" href="../../tasbot.html#tasbot.testplugin.Main.onsaidprivate">[docs]</a>		<span class="k">print</span> <span class="s">&quot;onsaidprivate(</span><span class="si">%s</span><span class="s">,</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">user</span><span class="p">),</span><span class="nb">str</span><span class="p">(</span><span class="n">message</span><span class="p">))</span>
+	<span class="k">def</span> <span class="nf">onloggedin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">socket</span><span class="p">):</span></div>
+<div class="viewcode-block" id="Main.onloggedin"><a class="viewcode-back" href="../../tasbot.html#tasbot.testplugin.Main.onloggedin">[docs]</a>		<span class="k">print</span> <span class="s">&quot;onloggedin(</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">socket</span><span class="p">))</span>
+		<span class="n">socket</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">&quot;JOIN main</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+	<span class="k">def</span> <span class="nf">onpong</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div>
+<div class="viewcode-block" id="Main.onpong"><a class="viewcode-back" href="../../tasbot.html#tasbot.testplugin.Main.onpong">[docs]</a>		<span class="k">print</span> <span class="s">&quot;onpong()&quot;</span>
+	<span class="k">def</span> <span class="nf">oncommandfromserver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">command</span><span class="p">,</span><span class="n">args</span><span class="p">,</span><span class="n">socket</span><span class="p">):</span></div>
+<div class="viewcode-block" id="Main.oncommandfromserver"><a class="viewcode-back" href="../../tasbot.html#tasbot.testplugin.Main.oncommandfromserver">[docs]</a>		<span class="k">print</span> <span class="s">&quot;oncommandfromserver(</span><span class="si">%s</span><span class="s">,</span><span class="si">%s</span><span class="s">,</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">command</span><span class="p">),</span><span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="p">),</span><span class="nb">str</span><span class="p">(</span><span class="n">socket</span><span class="p">))</span>
+	<span class="k">def</span> <span class="nf">onexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div>
+<div class="viewcode-block" id="Main.onexit"><a class="viewcode-back" href="../../tasbot.html#tasbot.testplugin.Main.onexit">[docs]</a>		<span class="k">print</span> <span class="s">&quot;onexit()&quot;</span>
+</pre></div></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">tasbot 0.2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Rene Milk, Andrea Piras, Tiziano.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

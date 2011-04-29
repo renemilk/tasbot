@@ -1,0 +1,188 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tasbot.customlog &mdash; tasbot 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="tasbot 0.2.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">tasbot 0.2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tasbot.customlog</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span><span class="nn">datetime</span><span class="o">,</span><span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">logging.handlers</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">from</span> <span class="nn">color_formatter</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">loggingLevelMapping</span> <span class="o">=</span> <span class="p">{</span>
+			<span class="s">&#39;debug&#39;</span>    <span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
+			<span class="s">&#39;info&#39;</span>     <span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+			<span class="s">&#39;error&#39;</span>    <span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span>
+			<span class="s">&#39;warn&#39;</span>     <span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARN</span><span class="p">,</span>
+			<span class="s">&#39;warning&#39;</span>  <span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span>
+			<span class="s">&#39;critical&#39;</span> <span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">,</span>
+			<span class="s">&#39;fatal&#39;</span>    <span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">FATAL</span><span class="p">,</span>
+		<span class="p">}</span>
+
+<div class="viewcode-block" id="ILogger"><a class="viewcode-back" href="../../tasbot.html#tasbot.customlog.ILogger">[docs]</a><span class="k">class</span> <span class="nc">ILogger</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">prefix</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">default_prefix</span> <span class="o">=</span> <span class="n">prefix</span>
+		
+	<span class="k">def</span> <span class="nf">_prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">msg</span><span class="p">,</span><span class="n">prefix</span><span class="p">):</span>
+		<span class="k">if</span> <span class="n">prefix</span><span class="p">:</span>
+			<span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;[</span><span class="si">%s</span><span class="s">] </span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span><span class="n">msg</span><span class="p">)</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_prefix</span><span class="p">:</span>
+			<span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s">&gt; </span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_prefix</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialised</span><span class="p">:</span>
+			<span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;Logger not initialised</span><span class="se">\n</span><span class="s">&#39;</span> <span class="p">)</span>
+			<span class="k">return</span> <span class="s">&#39;WARGH! logging is NOT initialised&#39;</span>
+		<span class="k">return</span> <span class="n">msg</span>
+
+<div class="viewcode-block" id="ILogger.Error"><a class="viewcode-back" href="../../tasbot.html#tasbot.customlog.ILogger.Error">[docs]</a>	<span class="k">def</span> <span class="nf">Error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span><span class="n">prefix</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare</span><span class="p">(</span> <span class="n">msg</span><span class="p">,</span><span class="n">prefix</span> <span class="p">)</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ILogger.Debug"><a class="viewcode-back" href="../../tasbot.html#tasbot.customlog.ILogger.Debug">[docs]</a>	<span class="k">def</span> <span class="nf">Debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span><span class="n">prefix</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare</span><span class="p">(</span> <span class="n">msg</span><span class="p">,</span><span class="n">prefix</span> <span class="p">)</span> <span class="p">)</span></div>
+<div class="viewcode-block" id="ILogger.Info"><a class="viewcode-back" href="../../tasbot.html#tasbot.customlog.ILogger.Info">[docs]</a>	<span class="k">def</span> <span class="nf">Info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span><span class="n">prefix</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare</span><span class="p">(</span> <span class="n">msg</span><span class="p">,</span><span class="n">prefix</span> <span class="p">)</span> <span class="p">)</span>
+		</div>
+<div class="viewcode-block" id="ILogger.Except"><a class="viewcode-back" href="../../tasbot.html#tasbot.customlog.ILogger.Except">[docs]</a>	<span class="k">def</span> <span class="nf">Except</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">e</span><span class="p">):</span>
+		<span class="c">#TODO needs prefix handling</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span> <span class="n">e</span> <span class="p">)</span>
+	</div>
+<div class="viewcode-block" id="ILogger.loaded"><a class="viewcode-back" href="../../tasbot.html#tasbot.customlog.ILogger.loaded">[docs]</a>	<span class="k">def</span> <span class="nf">loaded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">t</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span> <span class="n">t</span><span class="p">,</span> <span class="s">&quot;LOADED&quot;</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ILogger.reloaded"><a class="viewcode-back" href="../../tasbot.html#tasbot.customlog.ILogger.reloaded">[docs]</a>	<span class="k">def</span> <span class="nf">reloaded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">t</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span> <span class="n">t</span><span class="p">,</span> <span class="s">&quot;RELOADED&quot;</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ILogger.notice"><a class="viewcode-back" href="../../tasbot.html#tasbot.customlog.ILogger.notice">[docs]</a>	<span class="k">def</span> <span class="nf">notice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">t</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span> <span class="n">t</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ILogger.good"><a class="viewcode-back" href="../../tasbot.html#tasbot.customlog.ILogger.good">[docs]</a>	<span class="k">def</span> <span class="nf">good</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">t</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span> <span class="n">t</span><span class="p">,</span> <span class="s">&quot;GOOD&quot;</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ILogger.bad"><a class="viewcode-back" href="../../tasbot.html#tasbot.customlog.ILogger.bad">[docs]</a>	<span class="k">def</span> <span class="nf">bad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">t</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span> <span class="n">t</span><span class="p">,</span><span class="s">&quot;BAD&quot;</span> <span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="CLog"><a class="viewcode-back" href="../../tasbot.html#tasbot.customlog.CLog">[docs]</a><span class="k">class</span> <span class="nc">CLog</span><span class="p">(</span><span class="n">ILogger</span><span class="p">):</span>
+
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">ILogger</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="bp">None</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">initialised</span> <span class="o">=</span> <span class="bp">False</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">FORMAT</span> <span class="o">=</span> <span class="s">&#39;$BOLD</span><span class="si">%(levelname)s</span><span class="s">$RESET - </span><span class="si">%(asctime)s</span><span class="s"> - </span><span class="si">%(message)s</span><span class="s">&#39;</span>
+		
+<div class="viewcode-block" id="CLog.Init"><a class="viewcode-back" href="../../tasbot.html#tasbot.customlog.CLog.Init">[docs]</a>	<span class="k">def</span> <span class="nf">Init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logfile_name</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s">&#39;info&#39;</span><span class="p">,</span> <span class="n">stdout_log</span><span class="o">=</span><span class="bp">True</span> <span class="p">):</span>
+		<span class="n">logfile_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expandvars</span><span class="p">(</span> <span class="n">logfile_name</span> <span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">filehandler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">RotatingFileHandler</span><span class="p">(</span><span class="n">logfile_name</span><span class="p">,</span> <span class="n">maxBytes</span><span class="o">=</span><span class="mi">1048576</span><span class="p">,</span> <span class="n">backupCount</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span> <span class="c"># 1MB files</span>
+		<span class="k">if</span> <span class="n">stdout_log</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">streamhandler</span> <span class="o">=</span>  <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">streamhandler</span> <span class="o">=</span>  <span class="n">logging</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">streamformatter</span> <span class="o">=</span> <span class="n">ColoredFormatter</span><span class="p">(</span><span class="n">formatter_message</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FORMAT</span><span class="p">,</span> <span class="bp">True</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">fileformatter</span> <span class="o">=</span> <span class="n">ColoredFormatter</span><span class="p">(</span><span class="n">formatter_message</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FORMAT</span><span class="p">,</span> <span class="bp">False</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">streamhandler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">streamformatter</span> <span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">filehandler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileformatter</span> <span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;main&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">streamhandler</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filehandler</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span> <span class="n">loggingLevelMapping</span><span class="p">[</span><span class="n">level</span><span class="p">]</span> <span class="p">)</span>
+		
+		<span class="bp">self</span><span class="o">.</span><span class="n">initialised</span> <span class="o">=</span> <span class="bp">True</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span> <span class="s">&#39;session started&#39;</span> <span class="p">)</span>
+	</div>
+<div class="viewcode-block" id="CLog.getPluginLogger"><a class="viewcode-back" href="../../tasbot.html#tasbot.customlog.CLog.getPluginLogger">[docs]</a>	<span class="k">def</span> <span class="nf">getPluginLogger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+		<span class="k">return</span> <span class="n">PrefixedLogger</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="PrefixedLogger"><a class="viewcode-back" href="../../tasbot.html#tasbot.customlog.PrefixedLogger">[docs]</a><span class="k">class</span> <span class="nc">PrefixedLogger</span><span class="p">(</span><span class="n">ILogger</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clog</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+		<span class="n">ILogger</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;PL </span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="n">name</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">clog</span><span class="o">.</span><span class="n">logger</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">initialised</span> <span class="o">=</span> <span class="bp">True</span>
+</div>
+<span class="n">Log</span> <span class="o">=</span> <span class="n">CLog</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">tasbot 0.2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Rene Milk, Andrea Piras, Tiziano.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

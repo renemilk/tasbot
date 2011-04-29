@@ -1,0 +1,155 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tasbot.utilities &mdash; tasbot 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="tasbot 0.2.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">tasbot 0.2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tasbot.utilities</h1><div class="highlight"><pre>
+<div class="viewcode-block" id="getrank"><a class="viewcode-back" href="../../tasbot.html#tasbot.utilities.getrank">[docs]</a><span class="k">def</span> <span class="nf">getrank</span><span class="p">(</span><span class="n">status</span><span class="p">):</span>
+	<span class="n">bit0</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">bit1</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">3</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">bit2</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">4</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">rank</span> <span class="o">=</span> <span class="mi">1</span><span class="o">*</span><span class="n">bit0</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">bit1</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">bit2</span><span class="o">+</span><span class="mi">1</span>
+	<span class="k">return</span> <span class="n">rank</span></div>
+<div class="viewcode-block" id="getmod"><a class="viewcode-back" href="../../tasbot.html#tasbot.utilities.getmod">[docs]</a><span class="k">def</span> <span class="nf">getmod</span><span class="p">(</span><span class="n">status</span><span class="p">):</span>
+	<span class="k">return</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">5</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span></div>
+<div class="viewcode-block" id="getaway"><a class="viewcode-back" href="../../tasbot.html#tasbot.utilities.getaway">[docs]</a><span class="k">def</span> <span class="nf">getaway</span><span class="p">(</span><span class="n">status</span><span class="p">):</span>
+	<span class="k">return</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span></div>
+<div class="viewcode-block" id="getingame"><a class="viewcode-back" href="../../tasbot.html#tasbot.utilities.getingame">[docs]</a><span class="k">def</span> <span class="nf">getingame</span><span class="p">(</span><span class="n">status</span><span class="p">):</span>
+	<span class="k">return</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span></div>
+<div class="viewcode-block" id="getbot"><a class="viewcode-back" href="../../tasbot.html#tasbot.utilities.getbot">[docs]</a><span class="k">def</span> <span class="nf">getbot</span><span class="p">(</span><span class="n">status</span><span class="p">):</span>
+	<span class="k">return</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">6</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span></div>
+<span class="k">def</span> <span class="nf">getready</span><span class="p">(</span><span class="n">status</span><span class="p">):</span>
+	<span class="k">return</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+<div class="viewcode-block" id="getready"><a class="viewcode-back" href="../../tasbot.html#tasbot.utilities.getready">[docs]</a><span class="k">def</span> <span class="nf">getready</span><span class="p">(</span><span class="n">status</span><span class="p">):</span>
+	<span class="k">return</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span></div>
+<div class="viewcode-block" id="getteam"><a class="viewcode-back" href="../../tasbot.html#tasbot.utilities.getteam">[docs]</a><span class="k">def</span> <span class="nf">getteam</span><span class="p">(</span><span class="n">status</span><span class="p">):</span>
+	<span class="n">bit0</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">bit1</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">3</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">bit2</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">4</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">bit3</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">5</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">team</span> <span class="o">=</span> <span class="mi">1</span><span class="o">*</span><span class="n">bit0</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">bit1</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">bit2</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">bit3</span><span class="o">+</span><span class="mi">1</span>
+	<span class="k">return</span> <span class="n">team</span></div>
+<div class="viewcode-block" id="getally"><a class="viewcode-back" href="../../tasbot.html#tasbot.utilities.getally">[docs]</a><span class="k">def</span> <span class="nf">getally</span><span class="p">(</span><span class="n">status</span><span class="p">):</span>
+	<span class="n">bit0</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">6</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">bit1</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">7</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">bit2</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">bit3</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">9</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">team</span> <span class="o">=</span> <span class="mi">1</span><span class="o">*</span><span class="n">bit0</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">bit1</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">bit2</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">bit3</span><span class="o">+</span><span class="mi">1</span>
+	<span class="k">return</span> <span class="n">team</span></div>
+<div class="viewcode-block" id="getspec"><a class="viewcode-back" href="../../tasbot.html#tasbot.utilities.getspec">[docs]</a><span class="k">def</span> <span class="nf">getspec</span><span class="p">(</span><span class="n">status</span><span class="p">):</span>
+	<span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">10</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span></div>
+<div class="viewcode-block" id="gethand"><a class="viewcode-back" href="../../tasbot.html#tasbot.utilities.gethand">[docs]</a><span class="k">def</span> <span class="nf">gethand</span><span class="p">(</span><span class="n">status</span><span class="p">):</span>
+	<span class="n">bit0</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">11</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">bit1</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">12</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">bit2</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">13</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">bit3</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">14</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">bit4</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">15</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">bit5</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">16</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">bit6</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">17</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">hand</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="n">bit0</span><span class="o">+</span><span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">bit1</span><span class="o">+</span><span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">bit2</span><span class="o">+</span><span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">bit3</span><span class="o">+</span><span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">bit4</span><span class="o">+</span><span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span><span class="o">*</span><span class="n">bit5</span><span class="o">+</span><span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span><span class="o">*</span><span class="n">bit6</span><span class="o">+</span><span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">7</span><span class="p">)</span><span class="o">*</span><span class="n">bit4</span>
+	<span class="k">return</span> <span class="n">hand</span></div>
+<div class="viewcode-block" id="getsync"><a class="viewcode-back" href="../../tasbot.html#tasbot.utilities.getsync">[docs]</a><span class="k">def</span> <span class="nf">getsync</span><span class="p">(</span><span class="n">status</span><span class="p">):</span>
+	<span class="n">bit0</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">22</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">bit1</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">23</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">sync</span> <span class="o">=</span> <span class="mi">1</span><span class="o">*</span><span class="n">bit0</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">bit1</span>
+	<span class="k">return</span> <span class="n">sync</span></div>
+<div class="viewcode-block" id="getside"><a class="viewcode-back" href="../../tasbot.html#tasbot.utilities.getside">[docs]</a><span class="k">def</span> <span class="nf">getside</span><span class="p">(</span><span class="n">status</span><span class="p">):</span>
+	<span class="n">bit0</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">24</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">bit1</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">25</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">bit2</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">26</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">bit3</span> <span class="o">=</span> <span class="p">(</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">27</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span>
+	<span class="n">side</span> <span class="o">=</span> <span class="mi">1</span><span class="o">*</span><span class="n">bit0</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">bit1</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">bit2</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">bit3</span><span class="o">+</span><span class="mi">1</span>
+	<span class="k">return</span> <span class="n">side</span></div>
+<div class="viewcode-block" id="getcolor"><a class="viewcode-back" href="../../tasbot.html#tasbot.utilities.getcolor">[docs]</a><span class="k">def</span> <span class="nf">getcolor</span><span class="p">(</span><span class="n">status</span><span class="p">):</span>
+	<span class="n">r</span> <span class="o">=</span> <span class="nb">float</span><span class="p">((</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">255</span><span class="p">)</span><span class="o">/</span><span class="mf">255.0</span>
+	<span class="n">g</span> <span class="o">=</span> <span class="nb">float</span><span class="p">((</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">255</span><span class="p">)</span><span class="o">/</span><span class="mf">255.0</span>
+	<span class="n">b</span>  <span class="o">=</span> <span class="nb">float</span><span class="p">((</span><span class="n">status</span> <span class="o">&gt;&gt;</span> <span class="mi">16</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">255</span><span class="p">)</span><span class="o">/</span><span class="mf">255.0</span>
+	<span class="k">return</span> <span class="n">r</span><span class="p">,</span><span class="n">g</span><span class="p">,</span><span class="n">b</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">tasbot 0.2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Rene Milk, Andrea Piras, Tiziano.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1pre.
+    </div>
+  </body>
+</html>

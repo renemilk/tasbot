@@ -1,4 +1,6 @@
 *~
+build/
+dist/
 *.pyc
 README.html
 README.txt

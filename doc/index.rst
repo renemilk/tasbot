@@ -11,6 +11,11 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   README.rst
+
+.. automodule:: tasbot
+   :members:
+
 Indices and tables
 ==================
 

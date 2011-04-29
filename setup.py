@@ -4,7 +4,7 @@ setup(
     name='tasbot-spring',
     version='0.2.0',
     author=['Rene Milk','Andrea Piras','Tiziano'],
-    author_email=['koshi@springlobby.info','braindamage@springlobby.info','']
+    author_email=['koshi@springlobby.info','braindamage@springlobby.info',''],
     packages=['tasbot'] ,
     scripts=[],
     url='https://github.com/springlobby/tasbot',

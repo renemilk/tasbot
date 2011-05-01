@@ -1,10 +1,14 @@
 from tasbot.ParseConfig import *
 import string
 from tasbot.utilities import *
-class Main:
-	joined_channels = 0
-	admins = []
-	channels = []
+from tasbot.Plugin import IPlugin
+
+class Main(IPlugin):
+        def __init__(self,name,tasclient):
+                IPlugin.__init__(self,name,tasclient)
+		self.joined_channels = 0
+		self.admins = []
+		self.channels = []
 
 	def onloggedin(self,socket):
 		for chan in self.channels :

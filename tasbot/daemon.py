@@ -47,6 +47,7 @@ class Daemon(object):
 		self.stdout = stdout
 		self.stderr = stderr
 		self.pidfile = pidfile
+		self.daemonized = False
 	
 	def daemonize(self):
 		"""
@@ -90,6 +91,7 @@ class Daemon(object):
 			os.dup2(se.fileno(), sys.stderr.fileno())
 		
 		print "Started"
+		self.daemonized = True
 		
 		# Write pidfile
 		atexit.register(self.delpid) # Make sure pid file is removed if we quit

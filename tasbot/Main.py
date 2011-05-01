@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os, sys, string, base64, hashlib, time, ParseConfig, thread, Plugin, traceback, Client, binascii
+import os, sys, string, base64, hashlib, time, ParseConfig, thread, Plugin, traceback, Client, binascii, atexit
 from customlog import *
 from daemon import Daemon
 
@@ -91,6 +91,7 @@ class MainApp(Daemon):
 		self.configfile = configfile
 		self.config = ParseConfig.readconfigfile(configfile)
 		self.admins = ParseConfig.parselist(self.config["admins"],",")
+		self.config['cfg_dir'] = self.cwd
 		self.verbose = verbose
 		self.reg = register
 		self.tasclient = Client.Tasclient(self)
@@ -106,6 +107,11 @@ class MainApp(Daemon):
 
 	def run(self):
 		"""the main loop for MainApp, once this exists MainApp will be in unsable state"""
+		if not self.daemonized:
+			#we'll still drop a pidfile here to maek watchods happy
+			pid = str(os.getpid())
+			file(self.pidfile,'w+').write("%s\n" % pid)
+			atexit.register(self.delpid) # Make sure pid file is removed if we quit
 		while not self.force_quit:
 			try:
 				Log.notice("Connecting to %s:%i" % (self.config["serveraddr"],int(self.config["serverport"])))

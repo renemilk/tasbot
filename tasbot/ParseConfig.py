@@ -33,9 +33,13 @@ def readconfigfile(filename):
 		return dict()
 
 def writeconfigfile(filename,entries):
-	with open(filename,"w") as f:
-		for entry in entries:
-			f.write("%s=%s;\n" % (entry.lower().strip(),entries[entry].strip()))
+	try:
+		with open(filename,"w") as f:
+			for entry in entries:
+				f.write("%s=%s;\n" % (entry.lower().strip(),entries[entry].strip()))
+	except IOError, e:
+		Log.Except( e )
+		Log.Error( 'filename was: %s'%filename )
 
 def parselist(string,sep):
 	if string.count(sep) < 1:

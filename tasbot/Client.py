@@ -63,7 +63,7 @@ class Tasclient(object):
 			try:
 				result = self.receive()
 				if result == 1:
-					self.s.ondisconnected()
+					self.events.ondisconnected()
 					self.users = dict()
 					Log.Error("SERVER: Timed out, reconnecting in 40 secs")
 					self.main.connected = False
@@ -284,6 +284,8 @@ class Tasclient(object):
 						Log.Error("Invalid CLIENTSTATUS: No such user <%s>" % args[0])
 
 	def receive(self): #return commandname & args
+		if not self.socket:
+			return 1
 		buf = ""
 		try:
 			while not buf.strip("\r ").endswith("\n"):

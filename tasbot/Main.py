@@ -3,21 +3,27 @@
 import os, sys, string, base64, hashlib, time, ParseConfig, thread, Plugin, traceback, Client, binascii, atexit
 from customlog import *
 from daemon import Daemon
-
+from cogen.core.coroutines import coro
+from cogen.core.schedulers import Scheduler
+ 
 class MainApp(Daemon,Plugin.ThreadContainer):
 	"""main application object that has creates tasclient, pluginhandler and PingLoop instances"""
+	
+	@coro
 	def PingLoop(self):
 		"""sned a PING to the server every 10 seconds until either dying is true or i got into an error state"""
-		while not self.dying and self.er == 0:
+		while self.er == 0:
 			self.tasclient.ping()
 			time.sleep(10)
-		raise SystemExit(0)
+			yield
 	
 	def onlogin(self,socket):
 		"""start PingLoop and client mainloop, connect event handlers"""
 		if self.firstconnect == 1:
 			self.startThread(self.tasclient.mainloop)
-			self.startThread(self.PingLoop)
+			self.sched = Scheduler()
+			self.sched.add( self.PingLoop )
+			self.sched.iter_run()
 			self.firstconnect = 0
 
 		#self.tasclient.events.ondisconnected = self.ph.ondisconnected

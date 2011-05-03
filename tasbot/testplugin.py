@@ -1,15 +1,13 @@
-
 import string
 try:
 	from tasbot.Plugin import IPlugin
 except:
 	from Plugin import IPlugin
 
-#class Main(IPlugin):
-	#def __init__(self,name,tasclient):
-		#IPlugin.__init__(name,tasclient)
-class Main:
-		
+class Main(IPlugin):
+	def __init__(self,name,tasclient):
+		IPlugin.__init__(name,tasclient)
+
 	def onconnected(self):
 		print "onconnected()"
 	def ondisconnected(self):

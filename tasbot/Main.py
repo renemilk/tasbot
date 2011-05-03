@@ -4,11 +4,11 @@ import os, sys, string, base64, hashlib, time, ParseConfig, thread, Plugin, trac
 from customlog import *
 from daemon import Daemon
 
-class MainApp(Daemon):
+class MainApp(Daemon,Plugin.ThreadContainer):
 	"""main application object that has creates tasclient, pluginhandler and PingLoop instances"""
 	def PingLoop(self):
-		"""sned a PING to the server every 10 seconds until either force_quit is true or i got into an error state"""
-		while not self.force_quit and self.er == 0:
+		"""sned a PING to the server every 10 seconds until either dying is true or i got into an error state"""
+		while not self.dying and self.er == 0:
 			self.tasclient.ping()
 			time.sleep(10)
 		raise SystemExit(0)
@@ -16,8 +16,8 @@ class MainApp(Daemon):
 	def onlogin(self,socket):
 		"""start PingLoop and client mainloop, connect event handlers"""
 		if self.firstconnect == 1:
-			thread.start_new_thread(self.tasclient.mainloop,())
-			thread.start_new_thread(self.PingLoop,())
+			self.startThread(self.tasclient.mainloop)
+			self.startThread(self.PingLoop)
 			self.firstconnect = 0
 
 		#self.tasclient.events.ondisconnected = self.ph.ondisconnected
@@ -102,7 +102,7 @@ class MainApp(Daemon):
 		self.tasclient.events.onconnectedplugin = self.ph.onconnected
 		self.tasclient.events.onconnected = self.Dologin
 		self.tasclient.events.onloggedin = self.onlogin
-		self.force_quit = False
+		self.dying = False
 		
 
 	def run(self):
@@ -112,11 +112,11 @@ class MainApp(Daemon):
 			pid = str(os.getpid())
 			file(self.pidfile,'w+').write("%s\n" % pid)
 			atexit.register(self.delpid) # Make sure pid file is removed if we quit
-		while not self.force_quit:
+		while not self.dying:
 			try:
 				Log.notice("Connecting to %s:%i" % (self.config["serveraddr"],int(self.config["serverport"])))
 				self.tasclient.connect(self.config["serveraddr"],int(self.config["serverport"]))
-				while not self.force_quit:
+				while not self.dying:
 					time.sleep(10)
 			except SystemExit:
 				Log.Info( "MainApp got SystemExit" )
@@ -131,5 +131,6 @@ class MainApp(Daemon):
 			time.sleep(10)
 		self.ph.onexit()
 		self.ph.unloadAll()
+		self.ondestroy()
 		self.tasclient.disconnect()
 		self.tasclient = None

@@ -57,7 +57,7 @@ class Flags:
 class Tasclient(object):
 	"""the main interaction with server class"""
 	def mainloop(self):
-		while not self.main.force_quit:
+		while not self.main.dying:
 			if self.error == 1:
 				raise SystemExit(0)
 			try:
@@ -174,6 +174,9 @@ class Tasclient(object):
 	def sayex(self,channel,phrase):
 		self.join(channel)
 		self.socket.send("SAYEX %s %s\n" % (channel,phrase) )
+	
+	def saypm(self,user,phrase):
+		self.socket.send("SAYPRIVATE %s %s\n" % (user,phrase) )
 
 	def ping(self):
 		if self.error == 1:

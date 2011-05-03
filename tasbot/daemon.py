@@ -43,6 +43,7 @@ class Daemon(object):
 	Usage: subclass the Daemon class and override the run() method
 	"""
 	def __init__(self, pidfile, stdin=os.devnull, stdout=os.devnull, stderr=os.devnull):
+		super(Daemon,self).__init__()
 		self.stdin = stdin
 		self.stdout = stdout
 		self.stderr = stderr

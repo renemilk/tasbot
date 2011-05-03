@@ -22,22 +22,20 @@ def _async_raise(tid, exctype):
 class PluginThread(threading.Thread):
 	"""tiny wrapper to execute function with args in a thread"""
 	def __init__(self, func, *args ):
+		super(PluginThread,self).__init__()
 		self.func = func
 		self.args = args
-		threading.Thread.__init__(self)
 		
 	def run(self):
 		self.func( *self.args )
 		
-class IPlugin(object):
-	"""base class all plugins should derive from (and expose fitting ctor)"""
-	def __init__(self,name,tasclient):
-		self.tasclient = tasclient
-		self.name = name
-		self.logger = Log.getPluginLogger( name )
+class ThreadContainer(object):
+	def __init__(self):
+		super(ThreadContainer,self).__init__()
 		self.dying = False
 		self.threads = []
-		
+		self.logger = Log
+	
 	def ondestroy(self):
 		"""tell myself i'm dying and try to stop all my threads"""
 		self.dying = True
@@ -54,7 +52,7 @@ class IPlugin(object):
 			self.logger.Except( e )
 		self.threads = filter( lambda thread: isinstance(thread, PluginThread) and thread.isAlive(), self.threads )
 		if len(self.threads):
-			self.logger.Error( "%d threads left alive after destroy was called" )
+			self.logger.Error( "%d threads left alive after destroy was called"%len(self.threads) )
 			
 	def startThread(self,func,*args):
 		"""run a given function with args in a new thread that is added to an internal list"""
@@ -63,11 +61,20 @@ class IPlugin(object):
 		self.threads[-1].daemon = True
 		self.threads[-1].start()
 		
+class IPlugin(ThreadContainer):
+	"""base class all plugins should derive from (and expose fitting ctor)"""
+	def __init__(self,name,tasclient):
+		super(IPlugin,self).__init__()
+		self.tasclient = tasclient
+		self.name = name
+		self.logger = Log.getPluginLogger( name )
+		
 	
 class PluginHandler(object):
 	""" manage runtime loaded modules (plugins) """
 	
 	def __init__(self,main):
+		super(PluginHandler,self).__init__()
 		self.app = main
 		self.plugins = dict()
 		self.pluginthreads = dict()

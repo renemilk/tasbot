@@ -137,6 +137,10 @@ class MainApp(Daemon,Plugin.ThreadContainer):
 			time.sleep(10)
 		self.ph.onexit()
 		self.ph.unloadAll()
+		try:
+			self.sched.stop()
+		except:
+			pass
 		self.ondestroy()
 		self.tasclient.disconnect()
 		self.tasclient = None

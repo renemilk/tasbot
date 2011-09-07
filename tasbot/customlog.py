@@ -80,7 +80,11 @@ class CLog(ILogger):
 		self._logger = logging.getLogger('main')
 		self._logger.addHandler(self.streamhandler)
 		self._logger.addHandler(self.filehandler)
-		self._logger.setLevel( loggingLevelMapping[level] )
+		try:
+			self._logger.setLevel( loggingLevelMapping[level] )
+		except KeyError:
+			self._logger.setLevel( logging.ERROR )
+			self._logger.error('unkown log level %s requested, defaulting to logging.ERROR' % level)
 		
 		self._initialised = True
 		self._logger.info( 'session started' )

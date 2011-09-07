@@ -5,7 +5,7 @@ def getrank(status):
 	bit0 = (status >> 2) & 1
 	bit1 = (status >> 3) & 1
 	bit2 = (status >> 4) & 1
-	rank = 1 * bit 0 + 2 * bit1 + 2 * 2 * bit2 + 1
+	rank = 1 * bit0 + 2 * bit1 + 2 * 2 * bit2 + 1
 	return rank
 
 

@@ -60,7 +60,9 @@ class Config:
 
 	GetOptionList = get_optionlist
 
-	def write(self, filename=self._filename):
+	def write(self, filename=None):
+		if filename == None:
+			filename = self._filename
 		with open(filename, 'wb') as cfile:
 			self._config.write(cfile)
 

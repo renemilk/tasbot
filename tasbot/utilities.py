@@ -1,3 +1,5 @@
+import os
+
 def getrank(status):
 	bit0 = (status >> 2) & 1
 	bit1 = (status >> 3) & 1
@@ -59,3 +61,7 @@ def getcolor(status):
 	g = float((status >> 8) & 255)/255.0
 	b  = float((status >> 16) & 255)/255.0
 	return r,g,b
+	
+def createFileIfMissing(filename):
+	if not os.path.exists(filename):
+		open(filename,'w').close()

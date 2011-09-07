@@ -1,6 +1,9 @@
+"""tasbot module docstring"""
+
+__version__=(1,0,0)
+
 from Main import MainApp as DefaultApp
 import sys
-version=(1,0,0)
 
 #pretty sure there's buitins for this but I couldn't find them
 def _greater(a,b):
@@ -10,7 +13,7 @@ def _less(a,b):
 	
 def _compare(vtuple,op):
 	for i in range(len(vtuple)):
-		if op(version[i], vtuple[i]):
+		if op(__version__[i], vtuple[i]):
 			return False
 	return True
 	

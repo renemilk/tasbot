@@ -16,8 +16,8 @@ class MainApp(Daemon,Plugin.ThreadContainer):
 	def onlogin(self,socket):
 		"""start PingLoop and client mainloop, connect event handlers"""
 		if self.firstconnect == 1:
-			self.startThread(self.tasclient.mainloop)
-			self.startThread(self.PingLoop)
+			self.start_thread(self.tasclient.mainloop)
+			self.start_thread(self.PingLoop)
 			self.firstconnect = 0
 
 		#self.tasclient.events.ondisconnected = self.ph.ondisconnected
@@ -35,11 +35,11 @@ class MainApp(Daemon,Plugin.ThreadContainer):
 		self.connected = True
 		Log.good("Logged in")
 
-	def SaveConfig(self):
+	def save_config(self):
 		"""commit current config dictionary to file"""
 		self.config.write(self.configfile)
 
-	def isAdmin(self,username):
+	def is_admin(self,username):
 		"""return true if either username or the asscoiated id is in self.admins"""
 		if username in self.admins:
 				return True
@@ -51,7 +51,7 @@ class MainApp(Daemon,Plugin.ThreadContainer):
 		else:
 				return False
 
-	def Dologin(self):
+	def do_login(self):
 		"""handle tasserver login"""
 		if self.tasclient.flags.register:
 			Log.notice("Not logging in because a registration is in progress")
@@ -63,7 +63,7 @@ class MainApp(Daemon,Plugin.ThreadContainer):
 		phash = base64.b64encode(binascii.a2b_hex(m.hexdigest()))
 		self.tasclient.login(self.config.get('tasbot',"nick"),phash,"Newbot",2400,self.config.get('tasbot',"lanip","*"))
 
-	def Register(self,username,password):
+	def register(self,username,password):
 		"""register new account on tasserver"""
 		m = hashlib.md5()
 		m.update(self.config.get('tasbot',"password"))
@@ -75,7 +75,7 @@ class MainApp(Daemon,Plugin.ThreadContainer):
 		self.er = 1
 		raise SystemExit(0)
 
-	def ReloadConfig(self):
+	def reload_config(self):
 		"""reload config and admins from file"""
 		self.config = ParseConfig.Config(self.configfile)
 		self.admins = self.config.GetOptionList('tasbot',"admins")
@@ -89,7 +89,7 @@ class MainApp(Daemon,Plugin.ThreadContainer):
 		self.cwd = os.getcwd()
 		self.ph = Plugin.PluginHandler(self)
 		self.configfile = configfile
-		self.ReloadConfig()
+		self.reload_config()
 		self.config.set('tasbot','cfg_dir', self.cwd )
 		self.verbose = verbose
 		self.reg = register
@@ -99,7 +99,7 @@ class MainApp(Daemon,Plugin.ThreadContainer):
 			self.ph.addplugin(p,self.tasclient)
 
 		self.tasclient.events.onconnectedplugin = self.ph.onconnected
-		self.tasclient.events.onconnected = self.Dologin
+		self.tasclient.events.onconnected = self.do_login
 		self.tasclient.events.onloggedin = self.onlogin
 		self.dying = False
 		
@@ -118,15 +118,15 @@ class MainApp(Daemon,Plugin.ThreadContainer):
 				while not self.dying:
 					time.sleep(10)
 			except SystemExit:
-				Log.Info( "MainApp got SystemExit" )
+				Log.info( "MainApp got SystemExit" )
 				break
 			except KeyboardInterrupt:
-				Log.Error("SIGINT, Exiting")
+				Log.error("SIGINT, Exiting")
 				self.ph.onexit()
 				break
 			except Exception, e:
-				Log.Error("parsing command line")
-				Log.Except( e )
+				Log.error("parsing command line")
+				Log.exception( e )
 			time.sleep(10)
 		self.ph.onexit()
 		self.ph.unloadAll()

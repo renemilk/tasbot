@@ -15,42 +15,41 @@ class Config:
 			self._config.read( filename )
 		except Exception,e:
 			try:
-				Log.Error( "Configfile %s invalid"%self.filename)
-				Log.Except( e )
+				Log.error( "Configfile %s invalid"%self.filename)
+				Log.exception( e )
 			except AttributeError,e:
 				print('Error reading configfile %s and Logging not initialized'%filename)
 			raise SystemExit(1)
 
-	def GetSingleOption( self, section, key, default=None ):
+	def get( self, section, key, default=None ):
 		#find out reason why int keys fil to load
 		key=str(key)
 		#if isinstance(key,int):#uncomment this to locate int keys
-			#Log.Error('WUT')
+			#Log.error('WUT')
 			#traceback.print_stack()
 			#raise SystemExit(1)
 		try:
-			#return self._config.get(section,key)
 			return os.path.expandvars(self._config.get(section,key))
 		except NoOptionError:
 			if default==None:
-				Log.Error( 'no value or default found for config item %s -- %s'%(section,key) )
+				Log.error( 'no value or default found for config item %s -- %s'%(section,key) )
 		except Exception,e:
-			Log.Error( 'Error getting config item %s -- %s'%(section,key) )
-			Log.Except(e)
+			Log.error( 'Error getting config item %s -- %s'%(section,key) )
+			Log.exception(e)
 		return default
-	get=GetSingleOption
+	GetSingleOption=get
 		
 	def set(self,section,key,value):
 		self._config.set(section, key,value)
-		
 
-	def GetOptionList( self, section, key, seperator=',',default=[] ):
+	def get_optionlist( self, section, key, seperator=',',default=[] ):
 		try:
 			return self._parselist( self._config.get(section,key), seperator )
 		except Exception,e:
-			Log.Error('Error getting value list for key %s in section %s'%(key,section) )
-			Log.Except(e)
+			Log.error('Error getting value list for key %s in section %s'%(key,section) )
+			Log.exception(e)
 		return default
+	GetOptionList=get_optionlist
 
 	def write(self, filename):
 		with open(filename,'wb') as cfile:

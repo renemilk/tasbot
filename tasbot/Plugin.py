@@ -13,7 +13,7 @@ def _async_raise(tid, exctype):
         raise TypeError("Only types can be raised (not instances)")
     res = ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, ctypes.py_object(exctype))
     if res == 0:
-        Log.Error("Cannot kill thread %i" % tid)
+        Log.error("Cannot kill thread %i" % tid)
     if res != 1:
         # """if it returns a number greater than one, you're in trouble, 
         # and you should call it again with exc=NULL to revert the effect"""
@@ -48,13 +48,13 @@ class ThreadContainer(object):
 					#if its an old style id still try to terminate it (will prolly fail tho)
 					_async_raise( thread, SystemExit )
 		except Exception, e:
-			self.logger.Critical( "detroying %s plugin failed"%self.name)
-			self.logger.Except( e )
+			self.logger.error( "detroying %s plugin failed"%self.name)
+			self.logger.exception( e )
 		self.threads = filter( lambda thread: isinstance(thread, PluginThread) and thread.isAlive(), self.threads )
 		if len(self.threads):
 			self.logger.Error( "%d threads left alive after destroy was called"%len(self.threads) )
 			
-	def startThread(self,func,*args):
+	def start_thread(self,func,*args):
 		"""run a given function with args in a new thread that is added to an internal list"""
 		self.threads.append( PluginThread(func, *args) )
 		#app exists if only daemon threads are left alive
@@ -87,14 +87,14 @@ class PluginHandler(object):
 		try:
 			code = __import__(name)
 		except ImportError, imp:
-			Log.Error("Cannot load plugin   "+name)
-			Log.Except( imp )
+			Log.error("Cannot load plugin   "+name)
+			Log.exception( imp )
 			return
 		try:
 			self.plugins.update([(name,code.Main(name,tasc))])
 		except TypeError, t:
 			self.plugins.update([(name,code.Main())])
-			Log.Error( 'loaded old-style plugin %s. Please derive from IPlugin'%name)
+			Log.error( 'loaded old-style plugin %s. Please derive from IPlugin'%name)
 		self.plugins[name].socket = tasc.socket
 		
 		try:
@@ -103,14 +103,14 @@ class PluginHandler(object):
 			if "onloggedin" in dir(self.plugins[name]) and self.app.connected:
 				self.plugins[name].onloggedin(tasc.socket)
 		except Exception, e:
-			Log.Except( e )
+			Log.exception( e )
 			return
 		Log.loaded("Plugin " + name)
 		
 	def unloadplugin(self,name):
 		""" unload plugin, stop all its threads via ondestroy and remove from interal list"""
 		if not name in self.plugins:
-			Log.Error("Plugin %s not loaded"%name)
+			Log.error("Plugin %s not loaded"%name)
 			return
 		try:
 			if "ondestroy" in dir(self.plugins[name]):
@@ -118,9 +118,9 @@ class PluginHandler(object):
 			self.plugins.pop(name)
 			Log.notice("%s Unloaded" % name)
 		except Exception, e:
-			Log.Error("Cannot unload plugin   "+name)
-			Log.Error("Use forceunload to remove it anyway")
-			Log.Except( e )
+			Log.error("Cannot unload plugin   "+name)
+			Log.error("Use forceunload to remove it anyway")
+			Log.exception( e )
 			
 	def unloadAll(self):
 		"""convenience function to unload all plugins at once"""
@@ -132,7 +132,7 @@ class PluginHandler(object):
 	def forceunloadplugin(self,name,tasc):
 		"""simply removes name from internal list, only call if unload else fails"""
 		if not name in self.plugins:
-			Log.Error("Plugin %s not loaded"%name)
+			Log.error("Plugin %s not loaded"%name)
 			return
 		self.plugins.pop(name)
 		Log.bad("%s UnLog.loaded(Forced)" % name)
@@ -140,20 +140,20 @@ class PluginHandler(object):
 	def reloadplugin(self,name):
 		"""broken"""
 		if not name in self.plugins:
-			Log.Error("Plugin %s not loaded"%name)
+			Log.error("Plugin %s not loaded"%name)
 			return
 		try:
 			if "ondestroy" in dir(self.plugins[name]):
 				self.plugins[name].ondestroy()
 			Log.notice("%s Unloaded" % name)
 		except:
-			Log.Error("Cannot unload plugin   "+name)
-			Log.Error("Use forceunload to remove it anyway")
-			Log.Error( traceback.print_exc() )
+			Log.error("Cannot unload plugin   "+name)
+			Log.error("Use forceunload to remove it anyway")
+			Log.error( traceback.print_exc() )
 		try:
 			code = reload(sys.modules[name])
 		except:
-			Log.Error("Cannot reload plugin %s!" % name)
+			Log.error("Cannot reload plugin %s!" % name)
 			return
 		self.plugins.update([(name,code.Main())])
 		self.plugins[name].socket = self.app.tasclient.socket
@@ -162,8 +162,8 @@ class PluginHandler(object):
 			if "onload" in dir(self.plugins[name]):
 				self.plugins[name].onload(self.app.tasclient)
 		except:
-			Log.Error("Cannot load plugin   "+name)
-			Log.Error( traceback.print_exc() )
+			Log.error("Cannot load plugin   "+name)
+			Log.error( traceback.print_exc() )
 			return
 		Log.loaded("Plugin " + name)
 
@@ -176,8 +176,8 @@ class PluginHandler(object):
 			except SystemExit:
 				raise SystemExit(0)
 			except Exception,e :
-				Log.Error("PLUGIN %s ERROR calling  %s"%(func_name,name))
-				Log.Except( e )
+				Log.error("PLUGIN %s ERROR calling  %s"%(func_name,name))
+				Log.exception( e )
 				
 	def onconnected(self):
 		self.forall( "onconnected" )
@@ -204,21 +204,21 @@ class PluginHandler(object):
 				self.unloadplugin(args[1])
 			except:
 				Log.bad("Unloadplugin failed")
-				Log.Error( traceback.print_exc() )
+				Log.error( traceback.print_exc() )
 
 		if args[0].lower() == "!loadplugin" and user in self.app.admins and len(args) == 2:
 			try:
 				self.addplugin(args[1],self.app.tasclient)
 			except:
 				Log.bad("addplugin failed")
-				Log.Error( traceback.print_exc() )
+				Log.error( traceback.print_exc() )
 
 		if args[0].lower() == "!reloadplugin" and user in self.app.admins and len(args) == 2:
 			try:
 				self.reloadplugin(args[1])
 			except:
 				Log.bad("Unloadplugin failed")
-				Log.Error( traceback.print_exc() )
+				Log.error( traceback.print_exc() )
 
 		self.forall( "onsaidprivate",user,message)
 

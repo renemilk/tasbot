@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import sys,datetime,logging
+import sys
+import datetime
+import logging
 import logging.handlers
 import os.path
 from color_formatter import *
@@ -24,34 +26,34 @@ class ILogger(object):
 			msg = '[%s] %s'%(prefix,msg)
 		if self.default_prefix:
 			msg = '<%s> %s'%(self.default_prefix, msg)
-		if not self.initialised:
+		if not self._initialised:
 			sys.stderr.write( str(msg) + 'Logger not initialised\n' )
 			return 'WARGH! logging is NOT initialised'
 		return msg
 
-	def Error(self, msg,prefix=None):
-		self.logger.error( self._prepare( msg,prefix ) )
+	def error(self, msg,prefix=None):
+		self._logger.error( self._prepare( msg,prefix ) )
 
-	def Debug(self, msg,prefix=None):
-		self.logger.debug( self._prepare( msg,prefix ) )
-	def Info(self, msg,prefix=None):
-		self.logger.info( self._prepare( msg,prefix ) )
+	def debug(self, msg,prefix=None):
+		self._logger.debug( self._prepare( msg,prefix ) )
+	def info(self, msg,prefix=None):
+		self._logger.info( self._prepare( msg,prefix ) )
 		
-	def Except(self,e):
+	def exception(self,e):
 		#TODO needs prefix handling
-		self.logger.exception( e )
+		self._logger.exception( e )
 	
 	def loaded(self,t):
-		self.Info( t, "LOADED" )
+		self.info( t, "LOADED" )
 
 	def reloaded(self,t):
-		self.Info( t, "RELOADED" )
+		self.info( t, "RELOADED" )
 
 	def notice(self,t):
-		self.Info( t )
+		self.info( t )
 
 	def good(self,t):
-		self.Info( t, "GOOD" )
+		self.info( t, "GOOD" )
 
 	def bad(self,t):
 		self.Error( t,"BAD" )
@@ -60,10 +62,10 @@ class CLog(ILogger):
 
 	def __init__(self):
 		ILogger.__init__(self,None)
-		self.initialised = False
-		self.FORMAT = '$BOLD%(levelname)s$RESET - %(asctime)s - %(message)s'
+		self._initialised = False
+		self._FORMAT = '$BOLD%(levelname)s$RESET - %(asctime)s - %(message)s'
 		
-	def Init(self, logfile_name, level='info', stdout_log=True ):
+	def init(self, logfile_name, level='info', stdout_log=True ):
 		logfile_name = logfile_name
 		print 'fn',logfile_name
 		self.filehandler = logging.handlers.RotatingFileHandler(logfile_name, maxBytes=1048576, backupCount=5) # 1MB files
@@ -71,17 +73,17 @@ class CLog(ILogger):
 			self.streamhandler =  logging.StreamHandler(sys.stderr)
 		else:
 			self.streamhandler =  logging.handlers.NullHandler()
-		self.streamformatter = ColoredFormatter(formatter_message(self.FORMAT, True))
-		self.fileformatter = ColoredFormatter(formatter_message(self.FORMAT, False))
+		self.streamformatter = ColoredFormatter(formatter_message(self._FORMAT, True))
+		self.fileformatter = ColoredFormatter(formatter_message(self._FORMAT, False))
 		self.streamhandler.setFormatter( self.streamformatter )
 		self.filehandler.setFormatter( self.fileformatter )
-		self.logger = logging.getLogger('main')
-		self.logger.addHandler(self.streamhandler)
-		self.logger.addHandler(self.filehandler)
-		self.logger.setLevel( loggingLevelMapping[level] )
+		self._logger = logging.getLogger('main')
+		self._logger.addHandler(self.streamhandler)
+		self._logger.addHandler(self.filehandler)
+		self._logger.setLevel( loggingLevelMapping[level] )
 		
-		self.initialised = True
-		self.logger.info( 'session started' )
+		self._initialised = True
+		self._logger.info( 'session started' )
 	
 	def getPluginLogger(self, name):
 		return PrefixedLogger( self, name )
@@ -89,8 +91,8 @@ class CLog(ILogger):
 class PrefixedLogger(ILogger):
 	def __init__(self, clog,name):
 		ILogger.__init__(self, 'PL %s'%name)
-		self.logger = clog.logger
-		self.initialised = True
+		self._logger = clog._logger
+		self._initialised = True
 
 Log = CLog()
 

@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 import socket
-import string, re, time, utilities, sys, traceback
+import string
+import re
+import time
+import utilities
+import sys
+import traceback
 from utilities import *
 from customlog import Log
 
@@ -32,15 +37,15 @@ class ServerEvents:
 	def ondisconnected(self):
 		Log.bad("Disconnected")
 	def onmotd(self,content):
-		Log.Info( "[MOTD] "+content )
+		Log.info( "[MOTD] "+content )
 	def onsaid(self,channel,user,message):
-		Log.Info( "[CHANNEL] %s: <%s> %s"%(channel,user,message) )
+		Log.info( "[CHANNEL] %s: <%s> %s"%(channel,user,message) )
 	def onsaidex(self,channel,user,message):
-		Log.Info( "[CHANNELEX] %s: <%s> %s"%(channel,user,message) )
+		Log.info( "[CHANNELEX] %s: <%s> %s"%(channel,user,message) )
 	def onsaidprivate(self,user,message):
-		Log.Info( "[PRIVATE] <%s> %s"%(user,message) )
+		Log.info( "[PRIVATE] <%s> %s"%(user,message) )
 	def onloggedin(self,socket):
-		Log.Info( "[LOGIN] successful")
+		Log.info( "[LOGIN] successful")
 	def onpong(self):
 		#print blue+"PONG"+normal
 		pass
@@ -66,7 +71,7 @@ class Tasclient(object):
 				if result == 1:
 					self.events.ondisconnected()
 					self.users = dict()
-					Log.Error("SERVER: Timed out, reconnecting in 40 secs")
+					Log.error("SERVER: Timed out, reconnecting in 40 secs")
 					self.main.connected = False
 					if not self.flags.norecwait:
 						time.sleep(40.0)
@@ -84,8 +89,8 @@ class Tasclient(object):
 			except SystemExit:
 				raise SystemExit(0)
 			except Exception, e:
-				Log.Error("Command Error")
-				Log.Except( e )
+				Log.error("Command Error")
+				Log.exception( e )
 
 	def __init__(self,app):
 		self.events = ServerEvents()
@@ -118,8 +123,8 @@ class Tasclient(object):
 				raise SystemExit(0)
 			except Exception, e:
 				self.main.connected = False
-				Log.Error("Cannot connect, retrying in 40 secs...")
-				Log.Except( e )
+				Log.error("Cannot connect, retrying in 40 secs...")
+				Log.exception( e )
 				if self.error == 1:
 					raise SystemExit(0)
 				time.sleep(40.0)
@@ -128,7 +133,7 @@ class Tasclient(object):
 		try:
 			self.socket.send("EXIT\n")
 		except Exception, e:
-			Log.Except( e )
+			Log.exception( e )
 		self.socket.close()
 		self.socket = None
 
@@ -139,8 +144,8 @@ class Tasclient(object):
 		try:
 			self.socket.send("LOGIN %s %s %i %s %s\t0\t%s\n" % (username,password,cpu,lanip,client,"a sp"))
 		except Exception,e:
-			Log.Error("Cannot send login command")
-			Log.Except( e )
+			Log.error("Cannot send login command")
+			Log.exception( e )
 		self.uname = username
 		self.password = password
 		self.channels = []
@@ -151,8 +156,8 @@ class Tasclient(object):
 			Log.notice("Trying to register account")
 			self.socket.send("REGISTER %s %s\n" % (username,password))
 		except Exception,e:
-			Log.Error("Cannot send register command")
-			Log.Except( e )
+			Log.error("Cannot send register command")
+			Log.exception( e )
 
 	def leave(self,channel): #Leaves a channel
 		if channel in self.channels:
@@ -161,7 +166,7 @@ class Tasclient(object):
 				self.channels.remove(channel)
 			except Exception,e:
 				Log.bad("Failed to send LEAVE command")
-				Log.Except( e )
+				Log.exception( e )
 		else:
 			Log.bad("leave(%s) : Not in channel" % channel)
 
@@ -187,7 +192,7 @@ class Tasclient(object):
 			self.socket.send("PING\n")
 			self.lp = time.time()
 		except:
-			Log.Error("Cannot send ping command")
+			Log.error("Cannot send ping command")
 
 	def parsecommand(self,command,args):
 		if command.strip() != "":
@@ -201,7 +206,7 @@ class Tasclient(object):
 					self.channels.remove(args[0])
 					Log.bad("I've been kicked from #%s by <%s>" % (args[0],args[1]))
 				else:
-					Log.Error("I've been kicked from a channel that i haven't joined")
+					Log.error("I've been kicked from a channel that i haven't joined")
 			if command == "TASSERVER":
 				Log.good("Connected to server")
 
@@ -220,7 +225,7 @@ class Tasclient(object):
 			if command == "ACCEPTED":
 				self.events.onloggedin(self.socket)
 			if command == "DENIED" and ' '.join(args).lower().count("already") == 0:
-				Log.Error("Login failed ( %s ), trying to register..." % ' '.join(args))
+				Log.error("Login failed ( %s ), trying to register..." % ' '.join(args))
 				Log.notice("Closing Connection")
 				self.socket.close()
 				self.flags.register = True
@@ -239,20 +244,20 @@ class Tasclient(object):
 				try:
 					self.users[args[1]].battleid = int(args[0])
 				except:
-					Log.Error("Invalid JOINEDBATTLE Command from server: %s %s"%(command,str(args)))
-					Log.Error( traceback.format_exc() )
+					Log.error("Invalid JOINEDBATTLE Command from server: %s %s"%(command,str(args)))
+					Log.error( traceback.format_exc() )
 			if command == "BATTLEOPENED" and len(args) >= 4:
 				try:
 					self.users[args[3]].battleid = int(args[0])
 				except:
-					Log.Error("Invalid BATTLEOPENED Command from server: %s %s"%(command,str(args)))
-					Log.Error( traceback.format_exc() )
+					Log.error("Invalid BATTLEOPENED Command from server: %s %s"%(command,str(args)))
+					Log.error( traceback.format_exc() )
 			if command == "LEFTBATTLE" and len(args) >= 2:
 				try:
 					self.users[args[1]].battleid = -1
 				except:
-					Log.Error("Invalid LEFTBATTLE Command from server: %s %s"%(command,str(args)))
-					Log.Error( traceback.format_exc() )
+					Log.error("Invalid LEFTBATTLE Command from server: %s %s"%(command,str(args)))
+					Log.error( traceback.format_exc() )
 			if command == "SAIDPRIVATE" and len(args) >= 2:
 				self.events.onsaidprivate(args[0],' '.join(args[1:]))
 			if command == "ADDUSER":
@@ -264,29 +269,29 @@ class Tasclient(object):
 						self.users[args[0]] = User(args[0],int(-1),args[1],int(args[2]))
 						#Log.notice(args[0]+":"+"-1")
 					else:
-						Log.Error("Invalid ADDUSER Command from server: %s %s"%(command,str(args)))
+						Log.error("Invalid ADDUSER Command from server: %s %s"%(command,str(args)))
 					#Log.Debug('ADDUSER #%d args: '%len(self.users) + ' '.join( args ) )
 				except Exception,e:
-					Log.Error("Invalid ADDUSER Command from server: %s %s"%(command,str(args)))
-					Log.Except( e )
+					Log.error("Invalid ADDUSER Command from server: %s %s"%(command,str(args)))
+					Log.exception( e )
 			if command == "REMOVEUSER":
 				if len(args) == 1:
 					if args[0] in self.users:
 						del self.users[args[0]]
 					else:
-						Log.Error("Invalid REMOVEUSER Command: no such user"+args[0])
+						Log.error("Invalid REMOVEUSER Command: no such user"+args[0])
 				else:
-						Log.Error("Invalid REMOVEUSER Command: not enough arguments")
+						Log.error("Invalid REMOVEUSER Command: not enough arguments")
 			if command == "CLIENTSTATUS":
 				if len(args) == 2:
 					if args[0] in self.users:
 						try:
 							self.users[args[0]].clientstatus(int(args[1]))
 						except:
-							Log.Error("Malformed CLIENTSTATUS")
-							Log.Error( traceback.format_exc() )
+							Log.error("Malformed CLIENTSTATUS")
+							Log.error( traceback.format_exc() )
 					else:
-						Log.Error("Invalid CLIENTSTATUS: No such user <%s>" % args[0])
+						Log.error("Invalid CLIENTSTATUS: No such user <%s>" % args[0])
 
 	def receive(self): #return commandname & args
 		if not self.socket:
@@ -300,7 +305,7 @@ class Tasclient(object):
 					return 1
 				buf += nbuf
 		except Exception,e :
-			Log.Except( e )
+			Log.exception( e )
 			return 1 # Connection broken
 		commands = buf.strip("\r ").split("\n")
 		for cmd in commands:

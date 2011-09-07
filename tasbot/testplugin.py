@@ -1,6 +1,6 @@
 import string
 try:
-	from tasbot.Plugin import IPlugin
+	from tasbot.plugin import IPlugin
 except:
 	from Plugin import IPlugin
 

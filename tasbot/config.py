@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
-import string, traceback, os
-from customlog import *
-import os.path
+import string
+import traceback
+import os
 from ConfigParser import SafeConfigParser as ConfigParser
 from ConfigParser import NoOptionError
 import traceback
+
+from customlog import Log
 			
 class Config:
 	def __init__( self, filename ):

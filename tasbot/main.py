@@ -1,10 +1,24 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os, sys, string, base64, hashlib, time, ParseConfig, thread, Plugin, traceback, Client, binascii, atexit
+import os
+import sys
+import string
+import base64
+import hashlib
+import time
+import thread
+import traceback
+import binascii
+import atexit
+
 from customlog import *
 from daemon import Daemon
+import config
+import client
+import plugin
 
-class MainApp(Daemon,Plugin.ThreadContainer):
+
+class MainApp(Daemon,plugin.ThreadContainer):
 	"""main application object that has creates tasclient, pluginhandler and PingLoop instances"""
 	def PingLoop(self):
 		"""sned a PING to the server every 10 seconds until either dying is true or i got into an error state"""
@@ -77,7 +91,7 @@ class MainApp(Daemon,Plugin.ThreadContainer):
 
 	def reload_config(self):
 		"""reload config and admins from file"""
-		self.config = ParseConfig.Config(self.configfile)
+		self.config = config.Config(self.configfile)
 		self.admins = self.config.GetOptionList('tasbot',"admins")
 
 	def __init__(self,configfile,pidfile,register,verbose):
@@ -87,13 +101,13 @@ class MainApp(Daemon,Plugin.ThreadContainer):
 		self.er = 0
 		self.connected = False
 		self.cwd = os.getcwd()
-		self.ph = Plugin.PluginHandler(self)
+		self.ph = plugin.PluginHandler(self)
 		self.configfile = configfile
 		self.reload_config()
 		self.config.set('tasbot','cfg_dir', self.cwd )
 		self.verbose = verbose
 		self.reg = register
-		self.tasclient = Client.Tasclient(self)
+		self.tasclient = client.Tasclient(self)
 
 		for p in self.config.GetOptionList('tasbot',"plugins"):
 			self.ph.addplugin(p,self.tasclient)
@@ -107,7 +121,7 @@ class MainApp(Daemon,Plugin.ThreadContainer):
 	def run(self):
 		"""the main loop for MainApp, once this exists MainApp will be in unsable state"""
 		if not self.daemonized:
-			#we'll still drop a pidfile here to maek watchods happy
+			#we'll still drop a pidfile here to maek watchdogs happy
 			pid = str(os.getpid())
 			file(self.pidfile,'w+').write("%s\n" % pid)
 			atexit.register(self.delpid) # Make sure pid file is removed if we quit

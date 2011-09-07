@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-from customlog import Log
 import sys
 import traceback
 import inspect
 import ctypes
-import plugins
 import threading
+
+from customlog import Log
+import plugins
 
 def _async_raise(tid, exctype):
     '''Raises an exception in the threads with id tid (never seen working)'''
@@ -52,12 +53,12 @@ class ThreadContainer(object):
 			self.logger.exception( e )
 		self.threads = filter( lambda thread: isinstance(thread, PluginThread) and thread.isAlive(), self.threads )
 		if len(self.threads):
-			self.logger.Error( "%d threads left alive after destroy was called"%len(self.threads) )
+			self.logger.error( "%d threads left alive after destroy was called"%len(self.threads) )
 			
 	def start_thread(self,func,*args):
 		"""run a given function with args in a new thread that is added to an internal list"""
 		self.threads.append( PluginThread(func, *args) )
-		#app exists if only daemon threads are left alive
+		#app exits if only daemon threads are left alive
 		self.threads[-1].daemon = True
 		self.threads[-1].start()
 		
@@ -68,8 +69,7 @@ class IPlugin(ThreadContainer):
 		self.tasclient = tasclient
 		self.name = name
 		self.logger = Log.getPluginLogger( name )
-		
-	
+
 class PluginHandler(object):
 	""" manage runtime loaded modules (plugins) """
 	

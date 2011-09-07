@@ -2,7 +2,7 @@
 
 __version__=(1,0,0)
 
-from Main import MainApp as DefaultApp
+from main import MainApp as DefaultApp
 import sys
 
 #pretty sure there's buitins for this but I couldn't find them

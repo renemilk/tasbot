@@ -1,7 +1,7 @@
-from tasbot.ParseConfig import *
 import string
-from tasbot.utilities import *
-from tasbot.Plugin import IPlugin
+
+from tasbot.plugin import IPlugin
+from tasbot.config import *
 
 class Main(IPlugin):
 	def __init__(self,name,tasclient):

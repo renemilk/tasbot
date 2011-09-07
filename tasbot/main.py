@@ -18,24 +18,24 @@ import client
 import plugin
 
 
-class MainApp(Daemon,plugin.ThreadContainer):
-	"""main application object that has creates tasclient, pluginhandler and PingLoop instances"""
+class MainApp(Daemon, plugin.ThreadContainer):
+	"""main application object that has creates tasclient,
+		pluginhandler and PingLoop instances"""
 	def PingLoop(self):
-		"""sned a PING to the server every 10 seconds until either dying is true or i got into an error state"""
+		"""sned a PING to the server every 10 seconds until
+			either dying is true or i got into an error state"""
 		while not self.dying and self.er == 0:
 			self.tasclient.ping()
 			time.sleep(10)
 		raise SystemExit(0)
-	
-	def onlogin(self,socket):
+
+	def onlogin(self, socket):
 		"""start PingLoop and client mainloop, connect event handlers"""
 		if self.firstconnect == 1:
 			self.start_thread(self.tasclient.mainloop)
 			self.start_thread(self.PingLoop)
 			self.firstconnect = 0
-
 		#self.tasclient.events.ondisconnected = self.ph.ondisconnected
-
 		self.tasclient.events.onmotd = self.ph.onmotd
 		self.tasclient.events.onsaid = self.ph.onsaid
 		self.tasclient.events.onsaidex = self.ph.onsaidex
@@ -45,7 +45,7 @@ class MainApp(Daemon,plugin.ThreadContainer):
 		self.tasclient.events.ondisconnected = self.ph.ondisconnected
 
 		self.ph.onloggedin(socket)
-		self.ph.oncommandfromserver("ACCEPTED",[],self.tasclient.socket)
+		self.ph.oncommandfromserver("ACCEPTED", [], self.tasclient.socket)
 		self.connected = True
 		Log.good("Logged in")
 
@@ -53,17 +53,17 @@ class MainApp(Daemon,plugin.ThreadContainer):
 		"""commit current config dictionary to file"""
 		self.config.write(self.configfile)
 
-	def is_admin(self,username):
+	def is_admin(self, username):
 		"""return true if either username or the asscoiated id is in self.admins"""
 		if username in self.admins:
-				return True
+			return True
 		elif username in self.tasclient.users:
-				if "#"+str(self.tasclient.users[username].id) in self.admins:
-						return True
-				else:
-						return False
-		else:
+			if "#" + str(self.tasclient.users[username].id) in self.admins:
+				return True
+			else:
 				return False
+		else:
+			return False
 
 	def do_login(self):
 		"""handle tasserver login"""
@@ -73,15 +73,17 @@ class MainApp(Daemon,plugin.ThreadContainer):
 		if self.verbose:
 			Log.notice("Logging in...")
 		m = hashlib.md5()
-		m.update(self.config.get('tasbot',"password"))
+		m.update(self.config.get('tasbot', "password"))
 		phash = base64.b64encode(binascii.a2b_hex(m.hexdigest()))
-		self.tasclient.login(self.config.get('tasbot',"nick"),phash,"Newbot",2400,self.config.get('tasbot',"lanip","*"))
+		self.tasclient.login(self.config.get('tasbot', "nick"), phash,
+				"Newbot", 2400, self.config.get('tasbot', "lanip", "*"))
 
-	def register(self,username,password):
+	def register(self, username, password):
 		"""register new account on tasserver"""
 		m = hashlib.md5()
-		m.update(self.config.get('tasbot',"password"))
-		self.tasclient.register(self.config.get('tasbot',"nick"),base64.b64encode(binascii.a2b_hex(m.hexdigest())))
+		m.update(self.config.get('tasbot', "password"))
+		self.tasclient.register(self.config.get('tasbot', "nick"),
+				base64.b64encode(binascii.a2b_hex(m.hexdigest())))
 
 	def destroy(self):
 		"""deprecated"""
@@ -92,9 +94,9 @@ class MainApp(Daemon,plugin.ThreadContainer):
 	def reload_config(self):
 		"""reload config and admins from file"""
 		self.config = config.Config(self.configfile)
-		self.admins = self.config.GetOptionList('tasbot',"admins")
+		self.admins = self.config.GetOptionList('tasbot', "admins")
 
-	def __init__(self,configfile,pidfile,register,verbose):
+	def __init__(self, configfile, pidfile, register, verbose):
 		"""default init and plugin loading"""
 		super(MainApp, self).__init__(pidfile)
 		self.firstconnect = 1
@@ -104,35 +106,39 @@ class MainApp(Daemon,plugin.ThreadContainer):
 		self.ph = plugin.PluginHandler(self)
 		self.configfile = configfile
 		self.reload_config()
-		self.config.set('tasbot','cfg_dir', self.cwd )
+		self.config.set('tasbot', 'cfg_dir', self.cwd)
 		self.verbose = verbose
 		self.reg = register
 		self.tasclient = client.Tasclient(self)
 
-		for p in self.config.GetOptionList('tasbot',"plugins"):
-			self.ph.addplugin(p,self.tasclient)
+		for p in self.config.GetOptionList('tasbot', "plugins"):
+			self.ph.addplugin(p, self.tasclient)
 
 		self.tasclient.events.onconnectedplugin = self.ph.onconnected
 		self.tasclient.events.onconnected = self.do_login
 		self.tasclient.events.onloggedin = self.onlogin
 		self.dying = False
-		
 
 	def run(self):
-		"""the main loop for MainApp, once this exists MainApp will be in unsable state"""
+		"""the main loop for MainApp, once this
+			exits MainApp will be in unstable state"""
 		if not self.daemonized:
 			#we'll still drop a pidfile here to maek watchdogs happy
 			pid = str(os.getpid())
-			file(self.pidfile,'w+').write("%s\n" % pid)
-			atexit.register(self.delpid) # Make sure pid file is removed if we quit
+			file(self.pidfile, 'w+').write("%s\n" % pid)
+			#Make sure pid file is removed if we quit
+			atexit.register(self.delpid)
 		while not self.dying:
 			try:
-				Log.notice("Connecting to %s:%i" % (self.config.get('tasbot',"serveraddr"),int(self.config.get('tasbot',"serverport"))))
-				self.tasclient.connect(self.config.get('tasbot',"serveraddr"),int(self.config.get('tasbot',"serverport")))
+				Log.notice("Connecting to %s:%i" %
+						(self.config.get('tasbot', "serveraddr"),
+						int(self.config.get('tasbot', "serverport"))))
+				self.tasclient.connect(self.config.get('tasbot', "serveraddr"),
+						int(self.config.get('tasbot', "serverport")))
 				while not self.dying:
 					time.sleep(10)
 			except SystemExit:
-				Log.info( "MainApp got SystemExit" )
+				Log.info("MainApp got SystemExit")
 				break
 			except KeyboardInterrupt:
 				Log.error("SIGINT, Exiting")
@@ -140,7 +146,7 @@ class MainApp(Daemon,plugin.ThreadContainer):
 				break
 			except Exception, e:
 				Log.error("parsing command line")
-				Log.exception( e )
+				Log.exception(e)
 			time.sleep(10)
 		self.ph.onexit()
 		self.ph.unloadAll()

@@ -78,7 +78,7 @@ class Tasclient(object):
 						self.flags.norecwait = False
 					try:
 						self.socket.close()
-					except:
+					except Exception:
 						pass
 					self.socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 					self.socket.settimeout(40)
@@ -191,7 +191,7 @@ class Tasclient(object):
 		try:
 			self.socket.send("PING\n")
 			self.lp = time.time()
-		except:
+		except Exception:
 			Log.error("Cannot send ping command")
 
 	def parsecommand(self,command,args):
@@ -243,19 +243,19 @@ class Tasclient(object):
 			if command == "JOINEDBATTLE" and len(args) >= 2:
 				try:
 					self.users[args[1]].battleid = int(args[0])
-				except:
+				except Exception:
 					Log.error("Invalid JOINEDBATTLE Command from server: %s %s"%(command,str(args)))
 					Log.error( traceback.format_exc() )
 			if command == "BATTLEOPENED" and len(args) >= 4:
 				try:
 					self.users[args[3]].battleid = int(args[0])
-				except:
+				except Exception:
 					Log.error("Invalid BATTLEOPENED Command from server: %s %s"%(command,str(args)))
 					Log.error( traceback.format_exc() )
 			if command == "LEFTBATTLE" and len(args) >= 2:
 				try:
 					self.users[args[1]].battleid = -1
-				except:
+				except Exception:
 					Log.error("Invalid LEFTBATTLE Command from server: %s %s"%(command,str(args)))
 					Log.error( traceback.format_exc() )
 			if command == "SAIDPRIVATE" and len(args) >= 2:
@@ -287,7 +287,7 @@ class Tasclient(object):
 					if args[0] in self.users:
 						try:
 							self.users[args[0]].clientstatus(int(args[1]))
-						except:
+						except Exception:
 							Log.error("Malformed CLIENTSTATUS")
 							Log.error( traceback.format_exc() )
 					else:

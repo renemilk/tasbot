@@ -129,7 +129,7 @@ class Daemon(object):
 					os.remove( self.pidfile )
 					message = "removed stale pidfile %s"
 					sys.stderr.write(message % self.pidfile)
-				except:
+				except Exception:
 					message = "failed to remove stale pidfile %s with no corresponding process"
 					sys.stderr.write(message % self.pidfile)
 					sys.exit(1)

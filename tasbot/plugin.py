@@ -146,13 +146,13 @@ class PluginHandler(object):
 			if "ondestroy" in dir(self.plugins[name]):
 				self.plugins[name].ondestroy()
 			Log.notice("%s Unloaded" % name)
-		except:
+		except Exception:
 			Log.error("Cannot unload plugin   "+name)
 			Log.error("Use forceunload to remove it anyway")
 			Log.error( traceback.print_exc() )
 		try:
 			code = reload(sys.modules[name])
-		except:
+		except Exception:
 			Log.error("Cannot reload plugin %s!" % name)
 			return
 		self.plugins.update([(name,code.Main())])
@@ -161,7 +161,7 @@ class PluginHandler(object):
 		try:
 			if "onload" in dir(self.plugins[name]):
 				self.plugins[name].onload(self.app.tasclient)
-		except:
+		except Exception:
 			Log.error("Cannot load plugin   "+name)
 			Log.error( traceback.print_exc() )
 			return
@@ -202,21 +202,21 @@ class PluginHandler(object):
 		if args[0].lower() == "!unloadplugin" and user in self.app.admins and len(args) == 2:
 			try:
 				self.unloadplugin(args[1])
-			except:
+			except Exception:
 				Log.bad("Unloadplugin failed")
 				Log.error( traceback.print_exc() )
 
 		if args[0].lower() == "!loadplugin" and user in self.app.admins and len(args) == 2:
 			try:
 				self.addplugin(args[1],self.app.tasclient)
-			except:
+			except Exception:
 				Log.bad("addplugin failed")
 				Log.error( traceback.print_exc() )
 
 		if args[0].lower() == "!reloadplugin" and user in self.app.admins and len(args) == 2:
 			try:
 				self.reloadplugin(args[1])
-			except:
+			except Exception:
 				Log.bad("Unloadplugin failed")
 				Log.error( traceback.print_exc() )
 

@@ -1,7 +1,7 @@
 import string
 try:
 	from tasbot.plugin import IPlugin
-except:
+except Exception:
 	from Plugin import IPlugin
 
 class Main(IPlugin):

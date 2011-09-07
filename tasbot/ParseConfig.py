@@ -8,11 +8,11 @@ import traceback
 			
 class Config:
 	def __init__( self, filename ):
-		self.filename = filename
-		self.config = ConfigParser()
+		self._filename = filename
+		self._config = ConfigParser()
 		try:
 			open(filename,'r').close()
-			self.config.read( filename )
+			self._config.read( filename )
 		except Exception,e:
 			try:
 				Log.Error( "Configfile %s invalid"%self.filename)
@@ -22,15 +22,15 @@ class Config:
 			raise SystemExit(1)
 
 	def GetSingleOption( self, section, key, default=None ):
-		print section,key,default
+		#find out reason why int keys fil to load
 		key=str(key)
-		if isinstance(key,int):
-			Log.Error('WUT')
-			traceback.print_stack()
-			raise SystemExit(1)
+		#if isinstance(key,int):#uncomment this to locate int keys
+			#Log.Error('WUT')
+			#traceback.print_stack()
+			#raise SystemExit(1)
 		try:
-			return self.config.get(section,key)
-			#return os.path.expandvars(self.config.get(section,key))
+			#return self._config.get(section,key)
+			return os.path.expandvars(self._config.get(section,key))
 		except NoOptionError:
 			if default==None:
 				Log.Error( 'no value or default found for config item %s -- %s'%(section,key) )
@@ -39,17 +39,14 @@ class Config:
 			Log.Except(e)
 		return default
 	get=GetSingleOption
-	
-	def __getitem__(self,key):
-		return self.get('tasbot',key)
-	
-	def __setitem__(self,key,value):
-		self.config.set('tasbot', key,value)
+		
+	def set(self,section,key,value):
+		self._config.set(section, key,value)
 		
 
 	def GetOptionList( self, section, key, seperator=',',default=[] ):
 		try:
-			return self._parselist( self.config.get(section,key), seperator )
+			return self._parselist( self._config.get(section,key), seperator )
 		except Exception,e:
 			Log.Error('Error getting value list for key %s in section %s'%(key,section) )
 			Log.Except(e)
@@ -57,7 +54,7 @@ class Config:
 
 	def write(self, filename):
 		with open(filename,'wb') as cfile:
-			self.config.write(cfile)
+			self._config.write(cfile)
 
 	def _parselist(self,string,sep):
 		if string.count(sep) < 1:

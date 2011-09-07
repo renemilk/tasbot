@@ -33,7 +33,7 @@ class Main(IPlugin):
 		savestring = ""
 		for channel in self.channels:
 			savestring += channel + ","
-		self.app.config["channels"] = savestring
+		self.app.config.set('join_channels',"channels", savestring)
 		writeconfigfile("Main.conf",self.app.config)
 
 	def onload(self,tasc):

@@ -59,15 +59,15 @@ class MainApp(Daemon,Plugin.ThreadContainer):
 		if self.verbose:
 			Log.notice("Logging in...")
 		m = hashlib.md5()
-		m.update(self.config["password"])
+		m.update(self.config.get('tasbot',"password"))
 		phash = base64.b64encode(binascii.a2b_hex(m.hexdigest()))
-		self.tasclient.login(self.config["nick"],phash,"Newbot",2400,self.config.get('tasbot',"lanip","*"))
+		self.tasclient.login(self.config.get('tasbot',"nick"),phash,"Newbot",2400,self.config.get('tasbot',"lanip","*"))
 
 	def Register(self,username,password):
 		"""register new account on tasserver"""
 		m = hashlib.md5()
-		m.update(self.config["password"])
-		self.tasclient.register(self.config["nick"],base64.b64encode(binascii.a2b_hex(m.hexdigest())))
+		m.update(self.config.get('tasbot',"password"))
+		self.tasclient.register(self.config.get('tasbot',"nick"),base64.b64encode(binascii.a2b_hex(m.hexdigest())))
 
 	def destroy(self):
 		"""deprecated"""
@@ -90,7 +90,7 @@ class MainApp(Daemon,Plugin.ThreadContainer):
 		self.ph = Plugin.PluginHandler(self)
 		self.configfile = configfile
 		self.ReloadConfig()
-		self.config['cfg_dir'] = self.cwd
+		self.config.set('tasbot','cfg_dir', self.cwd )
 		self.verbose = verbose
 		self.reg = register
 		self.tasclient = Client.Tasclient(self)
@@ -113,8 +113,8 @@ class MainApp(Daemon,Plugin.ThreadContainer):
 			atexit.register(self.delpid) # Make sure pid file is removed if we quit
 		while not self.dying:
 			try:
-				Log.notice("Connecting to %s:%i" % (self.config["serveraddr"],int(self.config["serverport"])))
-				self.tasclient.connect(self.config["serveraddr"],int(self.config["serverport"]))
+				Log.notice("Connecting to %s:%i" % (self.config.get('tasbot',"serveraddr"),int(self.config.get('tasbot',"serverport"))))
+				self.tasclient.connect(self.config.get('tasbot',"serveraddr"),int(self.config.get('tasbot',"serverport")))
 				while not self.dying:
 					time.sleep(10)
 			except SystemExit:

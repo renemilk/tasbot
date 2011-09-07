@@ -109,7 +109,7 @@ class Tasclient(object):
 				self.events.onconnectedplugin()
 				if self.main.reg:
 					Log.notice("Registering nick")
-					self.main.Register(self.main.config["nick"],self.main.config["password"])
+					self.main.Register(self.main.config.get('tasbot',"nick"),self.main.config.get('tasbot',"password"))
 				res = self.receive()
 				if not res == 1:
 					return

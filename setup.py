@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='tasbot-spring',
-    version='0.2.2',
+    version='1.0.0',
     author=['Rene Milk','Andrea Piras','Tiziano'],
     author_email=['koshi@springlobby.info','braindamage@springlobby.info',''],
     packages=['tasbot'] ,

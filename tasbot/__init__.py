@@ -1,6 +1,6 @@
 from Main import MainApp as DefaultApp
 import sys
-version=(0,2,2)
+version=(1,0,0)
 
 #pretty sure there's buitins for this but I couldn't find them
 def _greater(a,b):

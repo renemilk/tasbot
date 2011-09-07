@@ -7,12 +7,16 @@ from ConfigParser import NoOptionError
 import traceback
 
 from customlog import Log
+from decorators import deprecated
 
 
-class Config:
+class Config(object):
 	def __init__(self, filename):
+		super(Config,self).__init__()
 		self._filename = filename
 		self._config = ConfigParser()
+		self.has_option = self._config.has_option
+		self.set = self._config.set
 		try:
 			open(filename, 'r').close()
 			self._config.read(filename)
@@ -26,7 +30,7 @@ class Config:
 			raise SystemExit(1)
 
 	def get(self, section, key, default=None):
-		#find out reason why int keys fil to load
+		#find out reason why int keys fail to load
 		key = str(key)
 		#if isinstance(key,int):#uncomment this to locate int keys
 			#Log.error('WUT')
@@ -43,11 +47,10 @@ class Config:
 							(section, key))
 			Log.exception(e)
 		return default
-
-	GetSingleOption = get
-
-	def set(self, section, key, value):
-		self._config.set(section, key, value)
+	
+	@deprecated
+	def GetSingleOption(self,*args, **kwargs):
+		return self.get(*args, **kwargs)
 
 	def get_optionlist(self, section, key, seperator=',', default=[]):
 		try:
@@ -58,7 +61,9 @@ class Config:
 			Log.exception(e)
 		return default
 
-	GetOptionList = get_optionlist
+	@deprecated
+	def GetOptionList(self,*args, **kwargs):
+		return self.get_optionlist(*args, **kwargs)
 
 	def write(self, filename=None):
 		if filename == None:

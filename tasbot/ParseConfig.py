@@ -2,75 +2,64 @@
 import string, traceback, os
 from customlog import *
 import os.path
-
-def readconfigfile(filename):
-	try:
-		with open(filename,"r") as f:
-			entries = dict()
-			s1 = f.read()
-			s2 = ""
-			for l in s1.replace("\r","").split("\n"):
-				if not l.strip(" \t").startswith("---"):
-					if l.count("---") == 0:
-						s2 += l+ "\n"
-					else:
-						h = l.split("---")
-						s2 += h[0]+ "\n"
-			s = s2.strip(" \n\r\t;").replace("\r\n","")
-			f.close()
-			j = s.split(";")
-			
-			for entry in j:
-				ed = entry.split("=")
-				if len(ed) >= 2:
-					entries.update([(ed[0].lower().strip(" \n\r\t;").replace("\r\n",""),"=".join(ed[1:]).strip(" \n\r\t;").replace("\r\n",""))])
-				else:
-					Log.Error("Invalid line on config file %s :\n\t%s" % ( filename , entry ) + normal)
-			#Log.good("Loaded config file %s succesfully, %i entries" % (filename,len(entries)))
-			return entries
-	except:
-		Log.Error("Error reading config file "+filename)
-		return dict()
-
-def writeconfigfile(filename,entries):
-	try:
-		with open(filename,"w") as f:
-			for entry in entries:
-				f.write("%s=%s;\n" % (entry.lower().strip(),entries[entry].strip()))
-	except IOError, e:
-		Log.Except( e )
-		Log.Error( 'filename was: %s'%filename )
-
-def parselist(string,sep):
-	if string.count(sep) < 1:
-		return [string]
-	j = string.split(sep)
-	l = []
-	for i in j:
-		l.append(os.path.expandvars(i.strip()))
-	return l
+from ConfigParser import SafeConfigParser as ConfigParser
+from ConfigParser import NoOptionError
+import traceback
 			
 class Config:
 	def __init__( self, filename ):
-		self.config = readconfigfile( filename )
 		self.filename = filename
+		self.config = ConfigParser()
+		try:
+			open(filename,'r').close()
+			self.config.read( filename )
+		except Exception,e:
+			try:
+				Log.Error( "Configfile %s invalid"%self.filename)
+				Log.Except( e )
+			except AttributeError,e:
+				print('Error reading configfile %s and Logging not initialized'%filename)
+			raise SystemExit(1)
 
-	def GetSingleOption( self, key, default ):
-		if key in self.config:
-			return os.path.expandvars(self.config[key])
+	def GetSingleOption( self, section, key, default=None ):
+		print section,key,default
+		key=str(key)
+		if isinstance(key,int):
+			Log.Error('WUT')
+			traceback.print_stack()
+			raise SystemExit(1)
+		try:
+			return self.config.get(section,key)
+			#return os.path.expandvars(self.config.get(section,key))
+		except NoOptionError:
+			if default==None:
+				Log.Error( 'no value or default found for config item %s -- %s'%(section,key) )
+		except Exception,e:
+			Log.Error( 'Error getting config item %s -- %s'%(section,key) )
+			Log.Except(e)
 		return default
+	get=GetSingleOption
+	
+	def __getitem__(self,key):
+		return self.get('tasbot',key)
+	
+	def __setitem__(self,key,value):
+		self.config.set('tasbot', key,value)
+		
 
-	def GetOptionList( self, key, seperator=',',default=[] ):
-		if key in self.config:
-			return parselist( self.config[key], seperator )
+	def GetOptionList( self, section, key, seperator=',',default=[] ):
+		try:
+			return self._parselist( self.config.get(section,key), seperator )
+		except Exception,e:
+			Log.Error('Error getting value list for key %s in section %s'%(key,section) )
+			Log.Except(e)
 		return default
-
-	def __getitem__(self, key):
-		val = self.GetSingleOption( key, ' ' )
-		if not val:
-			Log.Error( "key %s not found in %s"%(key,self.filename), 'Config' )
-			raise Exception
-		return val
 
 	def write(self, filename):
-		writeconfigfile( filename, self.config)
+		with open(filename,'wb') as cfile:
+			self.config.write(cfile)
+
+	def _parselist(self,string,sep):
+		if string.count(sep) < 1:
+			return [string]
+		return [os.path.expandvars(token.strip()) for token in string.split(sep)]

@@ -4,8 +4,8 @@ from tasbot.utilities import *
 from tasbot.Plugin import IPlugin
 
 class Main(IPlugin):
-        def __init__(self,name,tasclient):
-                IPlugin.__init__(self,name,tasclient)
+	def __init__(self,name,tasclient):
+		IPlugin.__init__(self,name,tasclient)
 		self.joined_channels = 0
 		self.admins = []
 		self.channels = []
@@ -38,5 +38,5 @@ class Main(IPlugin):
 
 	def onload(self,tasc):
 	    self.app = tasc.main
-	    self.admins = parselist(self.app.config["admins"],',')
-	    self.channels = parselist(self.app.config["channels"],',')
+	    self.admins = self.app.config.GetOptionList('tasbot',"admins")
+	    self.channels = self.app.config.GetOptionList('join_channels',"channels")

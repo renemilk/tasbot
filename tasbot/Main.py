@@ -37,7 +37,7 @@ class MainApp(Daemon,Plugin.ThreadContainer):
 
 	def SaveConfig(self):
 		"""commit current config dictionary to file"""
-		ParseConfig.writeconfigfile(self.configfile,self.config)
+		self.config.write(self.configfile)
 
 	def isAdmin(self,username):
 		"""return true if either username or the asscoiated id is in self.admins"""
@@ -61,7 +61,7 @@ class MainApp(Daemon,Plugin.ThreadContainer):
 		m = hashlib.md5()
 		m.update(self.config["password"])
 		phash = base64.b64encode(binascii.a2b_hex(m.hexdigest()))
-		self.tasclient.login(self.config["nick"],phash,"Newbot",2400,self.config["lanip"] if "lanip" in self.config else "*")
+		self.tasclient.login(self.config["nick"],phash,"Newbot",2400,self.config.get('tasbot',"lanip","*"))
 
 	def Register(self,username,password):
 		"""register new account on tasserver"""
@@ -77,8 +77,8 @@ class MainApp(Daemon,Plugin.ThreadContainer):
 
 	def ReloadConfig(self):
 		"""reload config and admins from file"""
-		self.config = ParseConfig.readconfigfile(self.configfile)
-		self.admins = ParseConfig.parselist(self.config["admins"],",")
+		self.config = ParseConfig.Config(self.configfile)
+		self.admins = self.config.GetOptionList('tasbot',"admins")
 
 	def __init__(self,configfile,pidfile,register,verbose):
 		"""default init and plugin loading"""
@@ -89,14 +89,13 @@ class MainApp(Daemon,Plugin.ThreadContainer):
 		self.cwd = os.getcwd()
 		self.ph = Plugin.PluginHandler(self)
 		self.configfile = configfile
-		self.config = ParseConfig.readconfigfile(configfile)
-		self.admins = ParseConfig.parselist(self.config["admins"],",")
+		self.ReloadConfig()
 		self.config['cfg_dir'] = self.cwd
 		self.verbose = verbose
 		self.reg = register
 		self.tasclient = Client.Tasclient(self)
 
-		for p in ParseConfig.parselist(self.config["plugins"],","):
+		for p in self.config.GetOptionList('tasbot',"plugins"):
 			self.ph.addplugin(p,self.tasclient)
 
 		self.tasclient.events.onconnectedplugin = self.ph.onconnected

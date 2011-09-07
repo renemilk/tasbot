@@ -64,7 +64,8 @@ class CLog(ILogger):
 		self.FORMAT = '$BOLD%(levelname)s$RESET - %(asctime)s - %(message)s'
 		
 	def Init(self, logfile_name, level='info', stdout_log=True ):
-		logfile_name = os.path.expandvars( logfile_name )
+		logfile_name = logfile_name
+		print 'fn',logfile_name
 		self.filehandler = logging.handlers.RotatingFileHandler(logfile_name, maxBytes=1048576, backupCount=5) # 1MB files
 		if stdout_log:
 			self.streamhandler =  logging.StreamHandler(sys.stderr)

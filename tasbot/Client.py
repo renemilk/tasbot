@@ -6,22 +6,23 @@ from customlog import Log
 
 class User:
 	def __init__(self,username,id,country,cpu):
-			self.username = username
-			self.id = id
-			self.country = country
-			self.cpu = cpu
-			self.afk = False
-			self.ingame = False
-			self.mod = False
-			self.rank = 0
-			self.bot = False
-			self.battleid = -1
+		self.username = username
+		self.id = id
+		self.country = country
+		self.cpu = cpu
+		self.afk = False
+		self.ingame = False
+		self.mod = False
+		self.rank = 0
+		self.bot = False
+		self.battleid = -1
+
 	def clientstatus(self,status):
-			self.afk = bool(getaway(int(status)))
-			self.ingame = bool(getingame(int(status)))
-			self.mod = bool(getmod(int(status)))
-			self.bot = bool(getbot(int(status)))
-			self.rank = getrank(status)-1
+		self.afk = bool(getaway(int(status)))
+		self.ingame = bool(getingame(int(status)))
+		self.mod = bool(getmod(int(status)))
+		self.bot = bool(getbot(int(status)))
+		self.rank = getrank(status)-1
 
 class ServerEvents:
 	def onconnected(self):
@@ -47,7 +48,7 @@ class ServerEvents:
 		#print yellow+"From Server: "+str(command)+" Args: "+str(args)+normal
 		pass
 	def onexit(self):
-	  pass
+		pass
 
 class Flags:
 	norecwait = False
@@ -130,6 +131,7 @@ class Tasclient(object):
 			Log.Except( e )
 		self.socket.close()
 		self.socket = None
+
 	def login(self,username,password,client,cpu,lanip="*"):
 		Log.notice("Trying to login with username %s " % (username))
 		lanip = self.socket.getsockname()[0]

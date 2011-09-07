@@ -98,3 +98,12 @@ def getcolor(status):
 def createFileIfMissing(filename):
 	if not os.path.exists(filename):
 		open(filename, 'w').close()
+		
+def parselist(string,sep):
+	if string.count(sep) < 1:
+		return [string]
+	j = string.split(sep)
+	l = []
+	for i in j:
+		l.append(os.path.expandvars(i.strip()))
+	return l

@@ -1,5 +1,4 @@
-from tasbot.ParseConfig import *
-from tasbot.Plugin import IPlugin
+from tasbot.plugin import IPlugin
 
 
 class Main(IPlugin):

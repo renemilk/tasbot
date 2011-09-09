@@ -25,12 +25,12 @@ def _compare(vtuple, op):
 def check_min_version(vtuple):
 	if not _compare(vtuple, _less):
 		print('tasbot version %s does not match minimum requirement %s' %
-				(str(version), str(vtuple)))
+				(str(__version__), str(vtuple)))
 		sys.exit(1)
 
 
 def check_max_version(vtuple):
 	if not _compare(vtuple, _greater):
 		print('tasbot version %s exceeds maximum requirement %s' %
-				(str(version), str(vtuple)))
+				(str(__version__), str(vtuple)))
 		sys.exit(1)

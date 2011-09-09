@@ -75,3 +75,13 @@ class Config(object):
 		if string.count(sep) < 1:
 			return [string]
 		return [os.path.expandvars(token.strip()) for token in string.split(sep)]
+
+	def get_bool(self, section, key, default=False):
+		try:
+			val = self._config.getboolean(section, key)
+			return val
+		except ValueError:
+			Log.error('Config option %s in section [%s] must be on of "1,yes,true,on" or "0,no,false,off"'%(section,key))
+		except Exception, e:
+			Log.excpetion(e)
+		return default		

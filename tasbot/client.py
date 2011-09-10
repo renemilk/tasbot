@@ -154,8 +154,8 @@ class Tasclient(object):
 
 	def login(self, username, password, client, cpu, lanip="*"):
 		Log.notice("Trying to login with username %s " % (username))
-		lanip = self.socket.getsockname()[0]
-		#print "LOGIN %s %s %i * %s\n" % (username,password,cpu,client)
+		#lanip = self.socket.getsockname()[0]
+		Log.debug("LOGIN %s %s %i %s %s\n" % (username,password,cpu,lanip,client))
 		try:
 			self.socket.send("LOGIN %s %s %i %s %s\t0\t%s\n" %
 							(username, password, cpu, lanip, client, "a sp"))

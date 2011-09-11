@@ -48,7 +48,7 @@ class Config(object):
 			Log.exception(e)
 		return default
 	
-	@deprecated
+	@deprecated('Config.get')
 	def GetSingleOption(self,*args, **kwargs):
 		return self.get(*args, **kwargs)
 
@@ -61,7 +61,7 @@ class Config(object):
 			Log.exception(e)
 		return default
 
-	@deprecated
+	@deprecated('Config.get_optionlist')
 	def GetOptionList(self,*args, **kwargs):
 		return self.get_optionlist(*args, **kwargs)
 

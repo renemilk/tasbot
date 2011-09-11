@@ -2,16 +2,15 @@ import warnings
 import functools
 
 
-def deprecated(func):
+def deprecated(func,alt='no alternative given'):
 	"""This is a decorator which can be used to mark functions
 	as deprecated. It will result in a warning being emitted
 	when the function is used."""
 	@functools.wraps(func)
 	def new_func(*args, **kwargs):
 		warnings.warn_explicit(
-			"Call to deprecated function %(funcname)s." % {
-				'funcname': func.__name__,
-			},
+			"Call to deprecated function %s.\nUse %s instead" % 
+				(func.__name__,alt),
 			category=DeprecationWarning,
 			filename=func.func_code.co_filename,
 			lineno=func.func_code.co_firstlineno + 1

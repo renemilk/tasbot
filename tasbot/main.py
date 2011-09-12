@@ -61,6 +61,9 @@ class MainApp(Daemon, plugin.ThreadContainer):
 			return "#" + str(self.tasclient.users[username].id) in self.admins
 		else:
 			return False
+	
+	def is_me(self, username):
+		return self.config.get('tasbot', "nick") == username
 
 	def do_login(self):
 		"""handle tasserver login"""

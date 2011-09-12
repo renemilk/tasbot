@@ -22,11 +22,3 @@ def deprecated(alt='no alternative given'):
 	return depracted_decorator
 
 
-def not_self(myname):
-	"""This decorator will only call the decorated function if user is not myname"""
-	def not_self_decorator(func):
-		def new_func(*args, **kwargs):
-			if args[1] != myname:
-				return func(*args, **kwargs)
-		return new_func
-	return not_self_decorator

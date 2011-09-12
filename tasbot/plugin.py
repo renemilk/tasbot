@@ -4,6 +4,7 @@ import traceback
 import inspect
 import ctypes
 import threading
+import functools
 
 from customlog import Log
 import plugins
@@ -83,6 +84,21 @@ class IPlugin(ThreadContainer):
 		self.tasclient = tasclient
 		self.name = name
 		self.logger = Log.getPluginLogger(name)
+	
+	@staticmethod
+	def _admin_only(func):
+		def decorated(self, args, socket):
+			if self.tasclient.main.is_admin(args[1]):
+				func(self, args, socket)
+		return decorated
+
+	@staticmethod
+	def _not_self(func):
+		"""This decorator will only call the decorated function if user is not myname"""
+		def decorated(self, args, socket):
+			if not self.tasclient.main.is_me(args[1]):
+				return func(self, args, socket)
+		return decorated
 
 
 class PluginHandler(object):

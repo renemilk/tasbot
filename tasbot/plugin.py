@@ -5,6 +5,7 @@ import inspect
 import ctypes
 import threading
 import functools
+from collections import defaultdict
 
 from customlog import Log
 import plugins
@@ -40,6 +41,8 @@ class Command(object):
 		self.trigger = trigger
 		self.min_no_args = min_no_args
 		self.access = access
+		
+	available = ('SAID', 'SAIDPRIVATE')
 
 
 class ThreadContainer(object):
@@ -84,9 +87,24 @@ class IPlugin(ThreadContainer):
 		self.tasclient = tasclient
 		self.name = name
 		self.logger = Log.getPluginLogger(name)
+		self.commands = defaultdict(list)
+		for f in filter( lambda f: f.startswith('cmd'), dir(self)):
+			try:
+				name_tokens = f.split('_')
+				if len(name_tokens) >= 3:
+					cmd = name_tokens[1].upper()
+					if cmd == 'WILD':
+						pass
+					elif cmd in Command.available:
+						self.commands[cmd].append(('!%s'%name_tokens[2],f))
+			except IndexError,e:
+				self.logger.debug(f)
+				self.logger.exception(e)
 	
 	@staticmethod
 	def _admin_only(func):
+		"""this decorator only calls the wrapped function if user(==args[1]) is in admin list"""
+		@functools.wraps(func)
 		def decorated(self, args, socket):
 			if self.tasclient.main.is_admin(args[1]):
 				func(self, args, socket)
@@ -95,11 +113,24 @@ class IPlugin(ThreadContainer):
 	@staticmethod
 	def _not_self(func):
 		"""This decorator will only call the decorated function if user is not myname"""
+		@functools.wraps(func)
 		def decorated(self, args, socket):
 			if not self.tasclient.main.is_me(args[1]):
 				return func(self, args, socket)
 		return decorated
-
+		
+	@staticmethod
+	def _num_args(num_args=3):
+		def _num_args_decorator(func):
+			"""This decorator will only call the decorated function if user is not myname"""
+			@functools.wraps(func)
+			def decorated(self, args, socket):
+				if len(args) >= num_args:
+					return func(self, args, socket)
+				else:
+					self.logger.debug('%s called with to few args'%func.__name__)
+			return decorated
+		return _num_args_decorator
 
 class PluginHandler(object):
 	""" manage runtime loaded modules (plugins) """

@@ -58,10 +58,7 @@ class MainApp(Daemon, plugin.ThreadContainer):
 		if username in self.admins:
 			return True
 		elif username in self.tasclient.users:
-			if "#" + str(self.tasclient.users[username].id) in self.admins:
-				return True
-			else:
-				return False
+			return "#" + str(self.tasclient.users[username].id) in self.admins
 		else:
 			return False
 

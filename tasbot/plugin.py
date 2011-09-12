@@ -34,6 +34,13 @@ class PluginThread(threading.Thread):
 		self.func(*self.args)
 
 
+class Command(object):
+	def __init__(self, trigger, min_no_args, access=(lambda args: True)):
+		self.trigger = trigger
+		self.min_no_args = min_no_args
+		self.access = access
+
+
 class ThreadContainer(object):
 	def __init__(self):
 		super(ThreadContainer, self).__init__()
@@ -175,13 +182,13 @@ class PluginHandler(object):
 			return
 		Log.loaded("Plugin " + name)
 
-	def forall(self, func_name, *args):
+	def forall(self, func_name, *args, **kwargs):
 		""" execute a given function(name) on all plugins that expose it"""
 		for name, plugin in filter(lambda (name, plugin):
 				func_name in dir(plugin), self.plugins.iteritems()):
 			try:
 				func = getattr(plugin, func_name)
-				func(*args)
+				func(*args, **kwargs)
 			except SystemExit:
 				raise SystemExit(0)
 			except Exception, e:

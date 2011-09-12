@@ -94,7 +94,9 @@ class IPlugin(ThreadContainer):
 				if len(name_tokens) >= 3:
 					cmd = name_tokens[1].upper()
 					if cmd == 'WILD':
-						pass
+						for available_cmd in Command.available:
+							if available_cmd.startswith(cmd):
+								self.commands[cmd].append(('!%s'%name_tokens[2],f))
 					elif cmd in Command.available:
 						self.commands[cmd].append(('!%s'%name_tokens[2],f))
 			except IndexError,e:

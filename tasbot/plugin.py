@@ -10,6 +10,8 @@ from collections import defaultdict
 from customlog import Log
 import plugins
 
+CHAT_COMMANDS = ('SAID', 'SAIDPRIVATE', 'SAIDEX', 'SAIDPRIVATEEX')
+ALL_COMMANDS = ( 'BATTLEOPENED', ) + CHAT_COMMANDS
 
 def _async_raise(tid, exctype):
 	'''Raises an exception in the threads with id tid (never seen working)'''
@@ -41,8 +43,6 @@ class Command(object):
 		self.trigger = trigger
 		self.min_no_args = min_no_args
 		self.access = access
-		
-	available = ('SAID', 'SAIDPRIVATE')
 
 
 class ThreadContainer(object):
@@ -88,17 +88,16 @@ class IPlugin(ThreadContainer):
 		self.name = name
 		self.logger = Log.getPluginLogger(name)
 		self.commands = defaultdict(list)
-		for f in filter( lambda f: f.startswith('cmd'), dir(self)):
+		for f in filter( lambda f: f.startswith('cmd_'), dir(self)):
 			try:
 				name_tokens = f.split('_')
-				if len(name_tokens) >= 3:
-					cmd = name_tokens[1].upper()
-					if cmd == 'WILD':
-						for available_cmd in Command.available:
-							if available_cmd.startswith(cmd):
-								self.commands[cmd].append(('!%s'%name_tokens[2],f))
-					elif cmd in Command.available:
-						self.commands[cmd].append(('!%s'%name_tokens[2],f))
+				cmd = name_tokens[1].upper()
+				if len(name_tokens) >= 3 and cmd in CHAT_COMMANDS:
+					self.commands[cmd].append(('!%s'%name_tokens[2],f))
+				elif cmd in ALL_COMMANDS:
+					self.commands[cmd].append((None,f))
+				else:
+					self.logger.error('trying to register function for unknown command %s'%cmd)
 			except IndexError,e:
 				self.logger.debug(f)
 				self.logger.exception(e)

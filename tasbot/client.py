@@ -200,6 +200,9 @@ class Tasclient(object):
 
 	def saypm(self, user, phrase):
 		self.socket.send("SAYPRIVATE %s %s\n" % (user, phrase))
+		
+	def send_raw(self, command):
+		self.socket.send(command)
 
 	def ping(self):
 		if self.error == 1:

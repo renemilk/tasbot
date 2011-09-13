@@ -203,6 +203,12 @@ class Tasclient(object):
 		
 	def send_raw(self, command):
 		self.socket.send(command)
+		
+	def say_pm_or_channel(self, trigger_command, pm_or_channel, phrase):
+		verb = trigger_command.replace('SAID', 'SAY')
+		if verb.find('PRIVATE') == -1:
+			self.join(pm_or_channel)
+		self.send_raw("%s %s %s\n" % (verb, pm_or_channel, phrase))
 
 	def ping(self):
 		if self.error == 1:

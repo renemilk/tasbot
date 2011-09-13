@@ -9,6 +9,7 @@ from collections import defaultdict
 
 from customlog import Log
 import plugins
+from decorators import check_and_mark_decorated
 
 CHAT_COMMANDS = ('SAID', 'SAIDPRIVATE', 'SAIDEX', 'SAIDPRIVATEEX')
 ALL_COMMANDS = ( 'BATTLEOPENED', ) + CHAT_COMMANDS
@@ -101,37 +102,110 @@ class IPlugin(ThreadContainer):
 			except IndexError,e:
 				self.logger.debug(f)
 				self.logger.exception(e)
-	
+		self.logger.debug('registered %d commands' % len(self.commands))
+		if 'oncommandfromserver' in dir(self) and len(self.commands) > 0:
+			self.logger.error('mixing old and new style command handling')
+		else:
+			self.oncommandfromserver = self._oncommandfromserver
+			
 	@staticmethod
 	def _admin_only(func):
 		"""this decorator only calls the wrapped function if user(==args[1]) is in admin list"""
+		func.admin_only = True
+		func.decorated = True
 		@functools.wraps(func)
-		def decorated(self, args, socket):
+		def decorated(self, args, tas_command):
 			if self.tasclient.main.is_admin(args[1]):
-				func(self, args, socket)
+				func(self, args, tas_command)
 		return decorated
 
 	@staticmethod
 	def _not_self(func):
 		"""This decorator will only call the decorated function if user is not myname"""
+		func.decorated = True
 		@functools.wraps(func)
-		def decorated(self, args, socket):
+		def decorated(self, args, tas_command):
 			if not self.tasclient.main.is_me(args[1]):
-				return func(self, args, socket)
+				return func(self, args, tas_command)
 		return decorated
 		
 	@staticmethod
 	def _num_args(num_args=3):
 		def _num_args_decorator(func):
+			if check_and_mark_decorated(func):
+				Log.error( "Trying to decorate %s in %s:%d "
+					"after it was already decorated. Currently " 
+					"_num_args must be the innermost decorator." % 
+					(func.__name__,func.func_code.co_filename,
+						func.func_code.co_firstlineno + 1))
+				raise SystemExit(1)
 			"""This decorator will only call the decorated function if user is not myname"""
 			@functools.wraps(func)
-			def decorated(self, args, socket):
+			def decorated(self, args, tas_command):
 				if len(args) >= num_args:
-					return func(self, args, socket)
+					return func(self, args, tas_command)
 				else:
-					self.logger.debug('%s called with to few args'%func.__name__)
+					self.logger.debug('%s called with too few args at %s:%d' % 
+					(func.__name__, func.func_code.co_filename,
+						func.func_code.co_firstlineno + 1))
 			return decorated
 		return _num_args_decorator
+
+	def _trim_chat_args(self, _args, tas_command):
+		args = _args[:]
+		del args[1]
+		if tas_command.find('PRIVATE') == -1:
+			del args[1]
+		return args
+
+	def cmd_said_help(self, args, tas_command):
+		args = self._trim_chat_args(args, tas_command)
+		#either way we're left with: user/channel [item]
+		target = args[0]
+		if len(args) > 1:
+			helpitem = args[1]
+			for command in CHAT_COMMANDS:
+				for trigger,funcname in self.commands[command]:
+					#allow both '!item' and 'item' to trigger the help
+					if trigger == None or trigger.replace('!','') != helpitem.replace('!',''):
+						continue
+					try:
+						func = getattr(self, funcname)
+						self.tasclient.say_pm_or_channel(tas_command, target, func.__doc__)
+						return
+					except Exception,e:
+						self.logger.exception(e)
+						continue
+			self.tasclient.say_pm_or_channel(tas_command, target, 'No further help available for \'%s\'.' % helpitem)
+		else:
+			self.tasclient.say_pm_or_channel(tas_command, target, 'available commands:')
+			for command in CHAT_COMMANDS:
+				for trigger,funcname in self.commands[command]:
+					if trigger == '!help':
+						continue
+					func = getattr(self,funcname)
+					if 'admin_only' in dir(func):
+						self.tasclient.say_pm_or_channel(tas_command, target, trigger + ' (admin-only)')
+					else:
+						self.tasclient.say_pm_or_channel(tas_command, target, trigger)
+			self.tasclient.say_pm_or_channel(tas_command, target, 'for further help try "!help [item]"')
+			
+	cmd_saidprivate_help = cmd_said_help
+	
+	def _oncommandfromserver(self, command, args, socket):
+		try:
+			for trigger,funcname in self.commands[command]:
+				#special treatment for chat commands that have keyword commands as first token in arglist
+				if ((command in CHAT_COMMANDS and command.find('PRIVATE') == -1 and trigger == args[2]) or
+						(command in CHAT_COMMANDS and trigger == args[1]) or
+						(command in set(ALL_COMMANDS).difference(CHAT_COMMANDS) and trigger == None)):
+					func = getattr(self, funcname)
+					func(args, command)
+		except KeyError, k:
+			self.logger.exception(k)
+		except Exception, e:
+			self.logger.exception(e)
+
 
 class PluginHandler(object):
 	""" manage runtime loaded modules (plugins) """

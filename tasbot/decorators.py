@@ -8,6 +8,7 @@ def deprecated(alt='no alternative given'):
 	as deprecated. It will result in a warning being emitted
 	when the function is used."""
 	def depracted_decorator(func):
+		func.decorated = True
 		@functools.wraps(func)
 		def new_func(*args, **kwargs):
 			Log.debug( warnings.formatwarning("Call to deprecated function %(funcname)s.\nUse %(alt)s instead" % {
@@ -22,3 +23,9 @@ def deprecated(alt='no alternative given'):
 	return depracted_decorator
 
 
+def check_and_mark_decorated(func):
+	"""Check if function was already decorated and mark decorated if it wasn't."""
+	if 'decorated' in dir(func):
+		return True
+	func.decorated = True
+	return False

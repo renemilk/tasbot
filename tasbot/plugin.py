@@ -39,13 +39,6 @@ class PluginThread(threading.Thread):
 		self.func(*self.args)
 
 
-class Command(object):
-	def __init__(self, trigger, min_no_args, access=(lambda args: True)):
-		self.trigger = trigger
-		self.min_no_args = min_no_args
-		self.access = access
-
-
 class ThreadContainer(object):
 	def __init__(self):
 		super(ThreadContainer, self).__init__()
@@ -89,6 +82,7 @@ class IPlugin(ThreadContainer):
 		self.name = name
 		self.logger = Log.getPluginLogger(name)
 		self.commands = defaultdict(list)
+		#this registers all cmd_* where * matches an actualLobby command in our command dict
 		for f in filter( lambda f: f.startswith('cmd_'), dir(self)):
 			try:
 				name_tokens = f.split('_')
@@ -102,9 +96,10 @@ class IPlugin(ThreadContainer):
 			except IndexError,e:
 				self.logger.debug(f)
 				self.logger.exception(e)
-		self.logger.debug('registered %d commands' % len(self.commands))
-		if 'oncommandfromserver' in dir(self) and len(self.commands) > 0:
-			self.logger.error('mixing old and new style command handling')
+		#if no oncommand is present in derived class we can safely move our generic on in
+		if 'oncommandfromserver' in dir(self):
+			if len(self.commands) > 0:
+				self.logger.error('mixing old and new style command handling')
 		else:
 			self.oncommandfromserver = self._oncommandfromserver
 			
@@ -131,6 +126,7 @@ class IPlugin(ThreadContainer):
 		
 	@staticmethod
 	def _num_args(num_args=3):
+		"""Ensure mandatory number of args. Only really useful for "said*" commands"""
 		def _num_args_decorator(func):
 			if check_and_mark_decorated(func):
 				Log.error( "Trying to decorate %s in %s:%d "
@@ -152,6 +148,13 @@ class IPlugin(ThreadContainer):
 		return _num_args_decorator
 
 	def _trim_chat_args(self, _args, tas_command):
+		""" remove cruft from SAID* responses
+			SAID[EX] channame username message becomes
+			SAID[EX] channame message[1:]
+			and
+			SAIDPRIVATE[EX] userame message becomes
+			SAIDPRIVATE[EX] username message[1:]
+		"""
 		args = _args[:]
 		del args[1]
 		if tas_command.find('PRIVATE') == -1:
@@ -159,6 +162,8 @@ class IPlugin(ThreadContainer):
 		return args
 
 	def cmd_said_help(self, args, tas_command):
+		"""Respond with a list of available chat commands or
+		a command specific help"""
 		args = self._trim_chat_args(args, tas_command)
 		#either way we're left with: user/channel [item]
 		target = args[0]
@@ -193,6 +198,7 @@ class IPlugin(ThreadContainer):
 	cmd_saidprivate_help = cmd_said_help
 	
 	def _oncommandfromserver(self, command, args, socket):
+		"""Automagically calls registered function matching command and args."""
 		try:
 			for trigger,funcname in self.commands[command]:
 				#special treatment for chat commands that have keyword commands as first token in arglist

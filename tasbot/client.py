@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 import socket
-import string
-import re
 import time
-import utilities
-import sys
 import traceback
 
 from utilities import *

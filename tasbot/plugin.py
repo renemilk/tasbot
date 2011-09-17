@@ -83,6 +83,7 @@ class IPlugin(ThreadContainer):
 		self.logger = Log.getPluginLogger(name)
 		self.commands = defaultdict(list)
 		#this registers all cmd_* where * matches an actualLobby command in our command dict
+		foreign_cmd_count = 0
 		for f in filter( lambda f: f.startswith('cmd_'), dir(self)):
 			try:
 				name_tokens = f.split('_')
@@ -93,12 +94,13 @@ class IPlugin(ThreadContainer):
 					self.commands[cmd].append((None,f))
 				else:
 					self.logger.error('trying to register function for unknown command %s'%cmd)
+				foreign_cmd_count += f != 'cmd_said_help' and f != 'cmd_saidprivate_help'
 			except IndexError,e:
 				self.logger.debug(f)
 				self.logger.exception(e)
 		#if no oncommand is present in derived class we can safely move our generic on in
 		if 'oncommandfromserver' in dir(self):
-			if len(self.commands) > 0:
+			if foreign_cmd_count:
 				self.logger.error('mixing old and new style command handling')
 		else:
 			self.oncommandfromserver = self._oncommandfromserver

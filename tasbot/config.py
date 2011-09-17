@@ -7,7 +7,7 @@ from ConfigParser import NoOptionError
 import traceback
 
 from customlog import Log
-from decorators import deprecated
+from decorators import Deprecated
 
 
 class Config(object):
@@ -48,7 +48,7 @@ class Config(object):
 			Log.exception(e)
 		return default
 	
-	@deprecated('Config.get')
+	@Deprecated('Config.get')
 	def GetSingleOption(self,*args, **kwargs):
 		return self.get(*args, **kwargs)
 
@@ -61,7 +61,7 @@ class Config(object):
 			Log.exception(e)
 		return default
 
-	@deprecated('Config.get_optionlist')
+	@Deprecated('Config.get_optionlist')
 	def GetOptionList(self,*args, **kwargs):
 		return self.get_optionlist(*args, **kwargs)
 

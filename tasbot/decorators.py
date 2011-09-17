@@ -1,6 +1,7 @@
 import warnings
 import functools
 import types 
+import inspect 
 
 from customlog import Log
 
@@ -34,24 +35,24 @@ class DecoratorWithArgsBase(object):
 		return types.MethodType(self, obj)
 
 
-def deprecated(alt='no alternative given'):
+class Deprecated(DecoratorBase):
 	"""This is a decorator which can be used to mark functions
 	as deprecated. It will result in a warning being emitted
 	when the function is used."""
-	def depracted_decorator(func):
+	def __init__(self,alt='no alternative given'):
+		self._alt = alt
+	
+	def __call__(self,func):
 		func.decorated = True
 		@functools.wraps(func)
 		def new_func(*args, **kwargs):
-			Log.debug( warnings.formatwarning("Call to deprecated function %(funcname)s.\nUse %(alt)s instead" % {
-							'funcname': func.__name__,
-							'alt':alt },
-						DeprecationWarning,
-						func.func_code.co_filename,
-						func.func_code.co_firstlineno + 1, "" )
-				)
+			frame = inspect.currentframe().f_back
+			msg = "DeprecationWarning. Call to deprecated function %s in %s:%s\nUse %s instead" % (
+							func.__name__,frame.f_code.co_filename,
+							frame.f_code.co_firstlineno,self._alt)
+			Log.debug(msg)
 			return func(*args, **kwargs)
 		return new_func
-	return depracted_decorator
 
 
 def check_and_mark_decorated(func):
@@ -77,10 +78,8 @@ class AdminOnly(DecoratorBase):
 
 
 class DebugTrace(DecoratorBase):
-
 	def __call__(self, *args, **kwargs):
-		print("Calling: {0}".format(self.func.__name__))
-		self.obj.logger.debug('TEST frweioqjfoiwerjf')
+		self.obj.logger.debug("Calling: {0}".format(self.func.__name__))
 		return self.func(*args, **kwargs)
 
 

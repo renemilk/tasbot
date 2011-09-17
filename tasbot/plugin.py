@@ -102,50 +102,6 @@ class IPlugin(ThreadContainer):
 				self.logger.error('mixing old and new style command handling')
 		else:
 			self.oncommandfromserver = self._oncommandfromserver
-			
-	@staticmethod
-	def _admin_only(func):
-		"""this decorator only calls the wrapped function if user(==args[1]) is in admin list"""
-		func.admin_only = True
-		func.decorated = True
-		@functools.wraps(func)
-		def decorated(self, args, tas_command):
-			if self.tasclient.main.is_admin(args[1]):
-				func(self, args, tas_command)
-		return decorated
-
-	@staticmethod
-	def _not_self(func):
-		"""This decorator will only call the decorated function if user is not myname"""
-		func.decorated = True
-		@functools.wraps(func)
-		def decorated(self, args, tas_command):
-			if not self.tasclient.main.is_me(args[1]):
-				return func(self, args, tas_command)
-		return decorated
-		
-	@staticmethod
-	def _num_args(num_args=3):
-		"""Ensure mandatory number of args. Only really useful for "said*" commands"""
-		def _num_args_decorator(func):
-			if check_and_mark_decorated(func):
-				Log.error( "Trying to decorate %s in %s:%d "
-					"after it was already decorated. Currently " 
-					"_num_args must be the innermost decorator." % 
-					(func.__name__,func.func_code.co_filename,
-						func.func_code.co_firstlineno + 1))
-				raise SystemExit(1)
-			"""This decorator will only call the decorated function if user is not myname"""
-			@functools.wraps(func)
-			def decorated(self, args, tas_command):
-				if len(args) >= num_args:
-					return func(self, args, tas_command)
-				else:
-					self.logger.debug('%s called with too few args at %s:%d' % 
-					(func.__name__, func.func_code.co_filename,
-						func.func_code.co_firstlineno + 1))
-			return decorated
-		return _num_args_decorator
 
 	def _trim_chat_args(self, _args, tas_command):
 		""" remove cruft from SAID* responses

@@ -91,7 +91,7 @@ class CLog(ILogger):
 			self._logger.setLevel( loggingLevelMapping[level] )
 		except KeyError:
 			self._logger.setLevel( logging.ERROR )
-			self._logger.error('unkown log level %s requested, defaulting to logging.ERROR' % level)
+			self._logger.error('unknown log level %s requested, defaulting to logging.ERROR' % level)
 
 		self._initialised = True
 		self._logger.info( 'session started' )

@@ -109,7 +109,7 @@ class IPlugin(ThreadContainer):
 				self.logger.error('mixing old and new style command handling')
 		else:
 			self.oncommandfromserver = self._oncommandfromserver
-		self.logger.debug('registered %d commands' % (len(self.commands- foreign_cmd_count)))
+		self.logger.debug('registered %d commands' % (cmd_count - foreign_cmd_count))
 
 	def _trim_chat_args(self, _args, tas_command):
 		""" remove cruft from SAID* responses
@@ -166,10 +166,10 @@ class IPlugin(ThreadContainer):
 		"""Automagically calls registered function matching command and args."""
 		try:
 			for trigger,funcname in self.commands[command]:
-				#special treatment for chat commands that have keyword commands as first token in arglist
-				if ((command in CHAT_COMMANDS and command.find('PRIVATE') == -1 and trigger == args[2]) or
-						(command in CHAT_COMMANDS and trigger == args[1]) or
-						(command in set(ALL_COMMANDS).difference(CHAT_COMMANDS) and trigger == None)):
+				do_call = (trigger == None) or (
+					(command.find('PRIVATE') == -1 and trigger == args[2]) or
+					(command.find('PRIVATE') > -1 and trigger == args[1]))
+				if do_call:
 					func = getattr(self, funcname)
 					func(args, command)
 		except KeyError, k:
@@ -207,6 +207,7 @@ class PluginHandler(object):
 		try:
 			self.plugins.update([(name, code.Main(name, tasc))])
 		except TypeError, t:
+			Log.exception(t)
 			self.plugins.update([(name, code.Main())])
 			Log.error('loaded old-style plugin %s. Please derive from IPlugin' % name)
 		self.plugins[name].socket = tasc.socket

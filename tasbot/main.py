@@ -94,7 +94,7 @@ class MainApp(Daemon, plugin.ThreadContainer):
 	def reload_config(self):
 		"""reload config and admins from file"""
 		self.config = config.Config(self.configfile)
-		self.admins = self.config.GetOptionList('tasbot', "admins")
+		self.admins = self.config.get_optionlist('tasbot', "admins")
 
 	def __init__(self, configfile, pidfile, register, verbose):
 		"""default init and plugin loading"""
@@ -111,7 +111,7 @@ class MainApp(Daemon, plugin.ThreadContainer):
 		self.reg = register
 		self.tasclient = client.Tasclient(self)
 
-		for p in self.config.GetOptionList('tasbot', "plugins"):
+		for p in self.config.get_optionlist('tasbot', "plugins"):
 			self.ph.addplugin(p, self.tasclient)
 
 		self.tasclient.events.onconnectedplugin = self.ph.onconnected

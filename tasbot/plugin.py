@@ -187,10 +187,14 @@ class PluginHandler(object):
 			return
 		try:
 			code = __import__(name)
-		except ImportError, imp:
-			Log.error("Cannot load plugin %s" % name)
-			Log.exception(imp)
-			return
+		except ImportError:
+			Log.debug('trying to load plugin %s from plugins subdir' % name )
+			try:
+				code = __import__('plugins.%s' % name)
+			except ImportError, imp:
+				Log.error("Cannot load plugin %s" % name)
+				Log.exception(imp)
+				raise SystemExit(1)
 		try:
 			self.plugins.update([(name, code.Main(name, tasc))])
 		except TypeError, t:

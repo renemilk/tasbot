@@ -1,3 +1,7 @@
+"""Lists of all currently documented lobby protocol commands.
+Extraced from ProtocolDescription.xml with bibim's perl script (see scripts/)
+"""
+
 client = (
 'ADDBOT',
 'ADDSTARTRECT',

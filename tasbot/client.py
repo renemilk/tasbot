@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+"""Code for interaction with lobby server/protocol."""
+
 import socket
 import time
 import traceback
@@ -8,6 +9,7 @@ from customlog import Log
 
 
 class User:
+	"""Model of an agent in the lobby protocol"""
 	def __init__(self, username, id, country, cpu):
 		self.username = username
 		self.id = id
@@ -196,10 +198,10 @@ class Tasclient(object):
 
 	def saypm(self, user, phrase):
 		self.socket.send("SAYPRIVATE %s %s\n" % (user, phrase))
-		
+
 	def send_raw(self, command):
 		self.socket.send(command)
-		
+
 	def say_pm_or_channel(self, trigger_command, pm_or_channel, phrase):
 		verb = trigger_command.replace('SAID', 'SAY')
 		if verb.find('PRIVATE') == -1:

@@ -1,7 +1,9 @@
+"""Collection of function/class based decorators."""
+
 import warnings
 import functools
-import types 
-import inspect 
+import types
+import inspect
 
 from customlog import Log
 
@@ -38,10 +40,12 @@ class DecoratorWithArgsBase(object):
 class Deprecated(DecoratorBase):
 	"""This is a decorator which can be used to mark functions
 	as deprecated. It will result in a warning being emitted
-	when the function is used."""
+	when the function is used.
+	"""
+
 	def __init__(self,alt='no alternative given'):
 		self._alt = alt
-	
+
 	def __call__(self,func):
 		func.decorated = True
 		@functools.wraps(func)
@@ -68,7 +72,7 @@ class AdminOnly(DecoratorBase):
 	def __init__(self,func):
 		func.admin_only = True
 		super(AdminOnly,self).__init__(func)
-		
+
 	def __call__(self, plugin, args, tas_command):
 		if plugin.tasclient.main.is_admin(args[1]):
 			return self.func(plugin, args, tas_command)
@@ -98,8 +102,8 @@ class MinArgs(DecoratorWithArgsBase):
 	def __call__(self,func):
 		if _is_decorated(func):
 			Log.error( "Trying to decorate %s in %s:%d "
-				"after it was already decorated. Currently " 
-				"_num_args must be the innermost decorator." % 
+				"after it was already decorated. Currently "
+				"_num_args must be the innermost decorator." %
 				(func.__name__,func.func_code.co_filename,
 					func.func_code.co_firstlineno + 1))
 			raise SystemExit(1)
@@ -111,7 +115,7 @@ class MinArgs(DecoratorWithArgsBase):
 			if len(args) >= self.num_args:
 				return func(plugin,args, tas_command)
 			else:
-				plugin.logger.debug('%s called with too few args at %s:%d' % 
+				plugin.logger.debug('%s called with too few args at %s:%d' %
 				(func.__name__, func.func_code.co_filename,
 					func.func_code.co_firstlineno + 1))
 		return decorated

@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+"""plugin loader/handler and base classes for common plugin functionality"""
+
 import sys
 import traceback
 import inspect
@@ -10,12 +11,13 @@ from collections import defaultdict
 from customlog import Log
 import plugins
 from decorators import check_and_mark_decorated
+from commands import server as ALL_COMMANDS
 
 CHAT_COMMANDS = ('SAID', 'SAIDPRIVATE', 'SAIDEX', 'SAIDPRIVATEEX')
-ALL_COMMANDS = ( 'BATTLEOPENED', ) + CHAT_COMMANDS
+
 
 def _async_raise(tid, exctype):
-	'''Raises an exception in the threads with id tid (never seen working)'''
+	"""Raises an exception in the threads with id tid (note: never seen working)"""
 	if not inspect.isclass(exctype):
 		raise TypeError("Only types can be raised (not instances)")
 	res = ctypes.pythonapi.PyThreadState_SetAsyncExc(tid,
@@ -40,6 +42,7 @@ class PluginThread(threading.Thread):
 
 
 class ThreadContainer(object):
+	"""Base for classes that need to manage a runtime variant number of child threads"""
 	def __init__(self):
 		super(ThreadContainer, self).__init__()
 		self.dying = False
@@ -67,7 +70,7 @@ class ThreadContainer(object):
 
 	def start_thread(self, func, *args):
 		"""run a given function with args in a
-		new thread that is added to an internal list"""
+		new thread that is added to the internal list"""
 		self.threads.append(PluginThread(func, *args))
 		#app exits if only daemon threads are left alive
 		self.threads[-1].daemon = True
@@ -84,6 +87,7 @@ class IPlugin(ThreadContainer):
 		self.commands = defaultdict(list)
 		#this registers all cmd_* where * matches an actualLobby command in our command dict
 		foreign_cmd_count = 0
+		cmd_count = 0
 		for f in filter( lambda f: f.startswith('cmd_'), dir(self)):
 			try:
 				name_tokens = f.split('_')
@@ -95,6 +99,7 @@ class IPlugin(ThreadContainer):
 				else:
 					self.logger.error('trying to register function for unknown command %s'%cmd)
 				foreign_cmd_count += f != 'cmd_said_help' and f != 'cmd_saidprivate_help'
+				cmd_count += 1
 			except IndexError,e:
 				self.logger.debug(f)
 				self.logger.exception(e)
@@ -104,6 +109,7 @@ class IPlugin(ThreadContainer):
 				self.logger.error('mixing old and new style command handling')
 		else:
 			self.oncommandfromserver = self._oncommandfromserver
+		self.logger.debug('registered %d commands' % (len(self.commands- foreign_cmd_count)))
 
 	def _trim_chat_args(self, _args, tas_command):
 		""" remove cruft from SAID* responses
@@ -121,7 +127,8 @@ class IPlugin(ThreadContainer):
 
 	def cmd_said_help(self, args, tas_command):
 		"""Respond with a list of available chat commands or
-		a command specific help"""
+		a command specific help
+		"""
 		args = self._trim_chat_args(args, tas_command)
 		#either way we're left with: user/channel [item]
 		target = args[0]
@@ -152,9 +159,9 @@ class IPlugin(ThreadContainer):
 					else:
 						self.tasclient.say_pm_or_channel(tas_command, target, trigger)
 			self.tasclient.say_pm_or_channel(tas_command, target, 'for further help try "!help [item]"')
-			
+
 	cmd_saidprivate_help = cmd_said_help
-	
+
 	def _oncommandfromserver(self, command, args, socket):
 		"""Automagically calls registered function matching command and args."""
 		try:

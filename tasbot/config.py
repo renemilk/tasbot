@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+"""Configuration backend."""
 import string
 import traceback
 import os
@@ -11,6 +11,10 @@ from decorators import Deprecated
 
 
 class Config(object):
+	"""Slim wrapper around python builtin config file parser
+	that mostly adds defaults and list-value handling
+	"""
+
 	def __init__(self, filename):
 		super(Config,self).__init__()
 		self._filename = filename
@@ -47,7 +51,7 @@ class Config(object):
 							(section, key))
 			Log.exception(e)
 		return default
-	
+
 	@Deprecated('Config.get')
 	def GetSingleOption(self,*args, **kwargs):
 		return self.get(*args, **kwargs)
@@ -84,4 +88,4 @@ class Config(object):
 			Log.error('Config option %s in section [%s] must be on of "1,yes,true,on" or "0,no,false,off"'%(section,key))
 		except Exception, e:
 			Log.exception(e)
-		return default		
+		return default

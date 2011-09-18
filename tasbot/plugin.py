@@ -190,7 +190,9 @@ class PluginHandler(object):
 		except ImportError:
 			Log.debug('trying to load plugin %s from plugins subdir' % name )
 			try:
-				code = __import__('plugins.%s' % name)
+				pname = 'tasbot.plugins.%s' % name
+				__import__(pname)
+				code = sys.modules[pname]
 			except ImportError, imp:
 				Log.error("Cannot load plugin %s" % name)
 				Log.exception(imp)

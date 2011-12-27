@@ -58,7 +58,7 @@ class Config(object):
 
 	def get_optionlist(self, section, key, seperator=',', default=[]):
 		try:
-			return self._parselist(self._config.get(section, key), seperator)
+			return Config.parselist(self._config.get(section, key), seperator)
 		except Exception, e:
 			Log.error('Error getting value list for key %s in section %s' %
 							(key, section))
@@ -75,7 +75,8 @@ class Config(object):
 		with open(filename, 'wb') as cfile:
 			self._config.write(cfile)
 
-	def _parselist(self, string, sep):
+	@classmethod
+	def parselist(cls,string, sep):
 		if string.count(sep) < 1:
 			return [string]
 		return [os.path.expandvars(token.strip()) for token in string.split(sep)]

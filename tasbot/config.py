@@ -15,6 +15,8 @@ class Config(object):
 		super(Config,self).__init__()
 		self._filename = filename
 		self._config = ConfigParser()
+		#make keys case sensitive
+		self._config.optionxform = str
 		self.has_option = self._config.has_option
 		self.set = self._config.set
 		try:
@@ -85,3 +87,6 @@ class Config(object):
 		except Exception, e:
 			Log.excpetion(e)
 		return default		
+
+	def items(self,section):
+		return self._config.items(section)

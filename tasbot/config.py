@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+"""Configuration backend."""
 import string
 import traceback
 import os
@@ -7,10 +7,14 @@ from ConfigParser import NoOptionError
 import traceback
 
 from customlog import Log
-from decorators import deprecated
+from decorators import Deprecated
 
 
 class Config(object):
+	"""Slim wrapper around python builtin config file parser
+	that mostly adds defaults and list-value handling
+	"""
+
 	def __init__(self, filename):
 		super(Config,self).__init__()
 		self._filename = filename
@@ -49,8 +53,8 @@ class Config(object):
 							(section, key))
 			Log.exception(e)
 		return default
-	
-	@deprecated
+
+	@Deprecated('Config.get')
 	def GetSingleOption(self,*args, **kwargs):
 		return self.get(*args, **kwargs)
 
@@ -63,7 +67,7 @@ class Config(object):
 			Log.exception(e)
 		return default
 
-	@deprecated
+	@Deprecated('Config.get_optionlist')
 	def GetOptionList(self,*args, **kwargs):
 		return self.get_optionlist(*args, **kwargs)
 
@@ -90,3 +94,4 @@ class Config(object):
 
 	def items(self,section):
 		return self._config.items(section)
+

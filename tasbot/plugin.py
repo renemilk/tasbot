@@ -110,6 +110,11 @@ class IPlugin(ThreadContainer):
 		else:
 			self.oncommandfromserver = self._oncommandfromserver
 		self.logger.debug('registered %d commands' % (cmd_count - foreign_cmd_count))
+		def us_compare(a, b):
+			"""this compare prefers said commands with triggers, avoiding calling said before said_trigger"""
+			return b[1].count('_') - a[1].count('_') 
+		for cmd, func_list in self.commands.iteritems():
+			self.commands[cmd] = sorted(func_list, cmp=us_compare)
 
 	def _trim_chat_args(self, _args, tas_command):
 		""" remove cruft from SAID* responses
@@ -172,6 +177,8 @@ class IPlugin(ThreadContainer):
 				if do_call:
 					func = getattr(self, funcname)
 					func(args, command)
+					#we rely on properly ordered self.commands[command] list
+					break
 		except KeyError, k:
 			self.logger.exception(k)
 		except Exception, e:

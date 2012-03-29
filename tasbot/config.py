@@ -15,7 +15,7 @@ class Config(object):
 	that mostly adds defaults and list-value handling
 	"""
 
-	def __init__(self, filename):
+	def __init__(self, filename='Main.conf'):
 		super(Config,self).__init__()
 		self._filename = filename
 		self._config = ConfigParser()

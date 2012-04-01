@@ -5,6 +5,20 @@ colors.py (c) 2009 rene.milk@uni-muenster.de
 Licence: WTFPLv2, see LICENSE.txt
 """
 
+class Color(object):
+	def __init__(self,t):
+		self._color_tuple = t
+		
+	def rgb(self):
+		"""range is [0,1]"""
+		return self._color_tuple
+	
+	def rgb255(self):
+		return tuple(int(x*256) for x in self._color_tuple )
+	
+	def hex(self):
+		return '#%s%s%s' % tuple(str(hex(x)[2:]) for x in self._color_tuple )
+		
 def __getHueVector( amount ):
 	level = 0;
 	while (1 << level) < amount:
@@ -64,7 +78,7 @@ def getColourPalette( size ):
 			hue -= 1
 		import colorsys
 		col = colorsys.hsv_to_rgb( hue, saturation, value )
-		result.append( col )
+		result.append( Color(col) )
 	return result
 
 def getColourPaletteCheat( size, filter_colors=[] ):

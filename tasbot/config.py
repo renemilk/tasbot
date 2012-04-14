@@ -90,7 +90,7 @@ class Config(object):
 		except ValueError:
 			Log.error('Config option %s in section [%s] must be on of "1,yes,true,on" or "0,no,false,off"'%(section,key))
 		except Exception, e:
-			Log.excpetion(e)
+			Log.exception(e)
 		return default		
 
 	def items(self,section):

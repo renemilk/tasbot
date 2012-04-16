@@ -14,10 +14,15 @@ class Color(object):
 		return self._color_tuple
 	
 	def rgb255(self):
-		return tuple(int(x*256) for x in self._color_tuple )
+		return tuple(int(x*255) for x in self._color_tuple )
 	
 	def hex(self):
-		return '#%s%s%s' % tuple(str(hex(x)[2:]) for x in self._color_tuple )
+		try:
+			return '#%s%s%s' % tuple(str(hex(x)[2:]) for x in self._color_tuple )
+		except:
+			return '#000000'
+	def __eq__(self, other):
+		return self._color_tuple.__eq__(other._color_tuple)
 		
 def __getHueVector( amount ):
 	level = 0;

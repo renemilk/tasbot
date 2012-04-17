@@ -18,7 +18,7 @@ class Color(object):
 	
 	def hex(self):
 		try:
-			return '#%s%s%s' % tuple(str(hex(x)[2:]) for x in self._color_tuple )
+			return '#%s%s%s' % tuple(str(hex(x)[2:]).rjust(2,'0') for x in self.rgb255())
 		except:
 			return '#000000'
 	def __eq__(self, other):

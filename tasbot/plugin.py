@@ -171,9 +171,11 @@ class IPlugin(ThreadContainer):
 		"""Automagically calls registered function matching command and args."""
 		try:
 			for trigger,funcname in self.commands[command]:
+				private = command.find('SAIDPRIVATE') > -1
+				battle  = command.find('SAIDBATTLE') > -1
 				do_call = (trigger == None) or (
-					(command.find('PRIVATE') == -1 and trigger == args[2]) or
-					(command.find('PRIVATE') > -1 and trigger == args[1]))
+					((private or battle) and trigger == args[1])) or
+					(not private and trigger == args[2])
 				if do_call:
 					func = getattr(self, funcname)
 					func(args, command)

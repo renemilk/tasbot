@@ -174,8 +174,8 @@ class IPlugin(ThreadContainer):
 				private = command.find('SAIDPRIVATE') > -1
 				battle  = command.find('SAIDBATTLE') > -1
 				do_call = (trigger == None) or (
-					((private or battle) and trigger == args[1])) or
-					(not private and trigger == args[2])
+					((private or battle) and trigger == args[1]) or
+					(not private and len(args) > 2 and trigger == args[2]))
 				if do_call:
 					func = getattr(self, funcname)
 					func(args, command)

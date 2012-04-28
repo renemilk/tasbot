@@ -13,7 +13,7 @@ import plugins
 from decorators import check_and_mark_decorated
 from commands import server as ALL_COMMANDS
 
-CHAT_COMMANDS = ('SAID', 'SAIDPRIVATE', 'SAIDEX', 'SAIDPRIVATEEX')
+CHAT_COMMANDS = ('SAID', 'SAIDPRIVATE', 'SAIDEX', 'SAIDPRIVATEEX', 'SAIDBATTLE', 'SAIDBATTLEEX')
 
 
 def _async_raise(tid, exctype):
